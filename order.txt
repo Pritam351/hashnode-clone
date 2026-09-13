@@ -1,0 +1,86 @@
+                    START
+                      │
+                      ▼
+             1. Project Setup
+                      │
+                      ▼
+             2. Express Server
+                      │
+                      ▼
+             3. MongoDB Connection
+                      │
+                      ▼
+             4. User Model
+                      │
+                      ▼
+             5. Post Model
+                      │
+                      ▼
+             6. Tag Model
+                      │
+                      ▼
+             7. Register
+                      │
+                      ▼
+             8. Login + JWT
+                      │
+                      ▼
+             9. Auth Middleware
+                      │
+                      ▼
+            10. Post CRUD API
+                      │
+                      ▼
+            11. Ownership Security
+                      │
+                      ▼
+            12. Tag API
+                      │
+                      ▼
+            13. Search API
+                      │
+                      ▼
+            14. Test Backend
+                with Postman
+                      │
+                      ▼
+            15. HTML Structure
+                      │
+                      ▼
+            16. CSS/UI
+                      │
+                      ▼
+            17. Frontend JS
+                      │
+                      ▼
+            18. Login/Register
+                      │
+                      ▼
+            19. Feed
+                      │
+                      ▼
+            20. Post Details
+                      │
+                      ▼
+            21. Markdown Editor
+                      │
+                      ▼
+            22. Dashboard
+                      │
+                      ▼
+            23. Profile
+                      │
+                      ▼
+            24. Settings
+                      │
+                      ▼
+            25. Integration Testing
+                      │
+                      ▼
+            26. Responsive Design
+                      │
+                      ▼
+            27. Deployment
+                      │
+                      ▼
+                    DONE
