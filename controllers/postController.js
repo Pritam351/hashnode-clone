@@ -103,8 +103,11 @@ const getPostBySlug = async (req, res) => {
         const { slug } = req.params;
 
         const post = await Post.findOne({
-            slug
-        });
+            slug,
+            status: "published"
+        })
+        .populate("author" , "name email")
+        .populate("tags" , "name slug");
 
         if (!post) {
             return res.status(404).json({
@@ -114,7 +117,7 @@ const getPostBySlug = async (req, res) => {
 
         return res.status(200).json({
             post
-        });
+        })
 
     } catch (error) {
         console.error(error);
