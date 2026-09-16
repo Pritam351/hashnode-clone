@@ -4,6 +4,7 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
+const tagRoutes = require("./routes/tagroutes");
 
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 connectDB();
 
 app.use("/api/auth", authRoutes);
+app.use("/api/tags", tagRoutes);
 
 app.get("/", (req, res) => {
     res.json({
