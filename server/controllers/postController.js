@@ -98,7 +98,35 @@ const getPosts = async (req, res) => {
     }
 };
 
+const getPostBySlug = async (req, res) => {
+    try {
+        const { slug } = req.params;
+
+        const post = await Post.findOne({
+            slug
+        });
+
+        if (!post) {
+            return res.status(404).json({
+                message: "Post not found"
+            });
+        }
+
+        return res.status(200).json({
+            post
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
     createPost,
-    getPosts
+    getPosts,
+    getPostBySlug
 };
