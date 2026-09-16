@@ -79,6 +79,26 @@ const createPost = async (req, res) => {
     }
 };
 
+const getPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({
+            status: "published"
+        });
+
+        return res.status(200).json({
+            posts
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
-    createPost 
+    createPost,
+    getPosts
 };
