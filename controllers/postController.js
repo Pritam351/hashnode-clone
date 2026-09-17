@@ -128,8 +128,31 @@ const getPostBySlug = async (req, res) => {
     }
 };
 
+const getMyPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({
+            author: req.userId
+        })
+        .populate("author", "name email")
+        .populate("tags", "name slug")
+        .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            posts
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getPosts,
-    getPostBySlug
+    getPostBySlug,
+    getMyPosts
 };
