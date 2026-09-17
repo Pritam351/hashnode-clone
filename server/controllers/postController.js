@@ -133,6 +133,15 @@ const getMyPosts = async (req, res) => {
 
         const { status } = req.query;
 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({
+                message: " page and limit must be grate than 0"
+            });
+        }
+
         const filter = {
             author: req.userId
         };
@@ -146,14 +155,26 @@ const getMyPosts = async (req, res) => {
             filter.status = status;
         }
 
+        const skip = (page - 1) * limit;
 
         const posts = await Post.find(filter)
         .populate("author", "name email")
         .populate("tags", "name slug")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+        const totalPosts = await Post.countDocuments(filter);
+        const totalPages = Math.ceil(totalPosts / limit);
 
         return res.status(200).json({
-            posts
+            posts,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalPosts,
+                totalPages
+            }
         });
 
     } catch (error) {
