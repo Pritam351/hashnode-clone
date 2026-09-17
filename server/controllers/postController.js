@@ -130,9 +130,24 @@ const getPostBySlug = async (req, res) => {
 
 const getMyPosts = async (req, res) => {
     try {
-        const posts = await Post.find({
+
+        const { status } = req.query;
+
+        const filter = {
             author: req.userId
-        })
+        };
+
+        if (status){
+            if (status !== "draft" && status !== "published") {
+                return res.status(400).json({
+                    message: "Status must be Published or draft"
+                });
+            }
+            filter.status = status;
+        }
+
+
+        const posts = await Post.find(filter)
         .populate("author", "name email")
         .populate("tags", "name slug")
         .sort({ createdAt: -1 });
