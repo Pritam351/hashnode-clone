@@ -1,7 +1,7 @@
 const Post = require("../models/Post");
 const Tag = require("../models/Tag");
 
-const createPost = async (req, res) => { 
+const createPost = async (req, res) => {
     try {
 
         const {
@@ -106,8 +106,8 @@ const getPostBySlug = async (req, res) => {
             slug,
             status: "published"
         })
-        .populate("author" , "name email")
-        .populate("tags" , "name slug");
+            .populate("author", "name email")
+            .populate("tags", "name slug");
 
         if (!post) {
             return res.status(404).json({
@@ -146,7 +146,7 @@ const getMyPosts = async (req, res) => {
             author: req.userId
         };
 
-        if (status){
+        if (status) {
             if (status !== "draft" && status !== "published") {
                 return res.status(400).json({
                     message: "Status must be Published or draft"
@@ -158,11 +158,11 @@ const getMyPosts = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const posts = await Post.find(filter)
-        .populate("author", "name email")
-        .populate("tags", "name slug")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+            .populate("author", "name email")
+            .populate("tags", "name slug")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
         const totalPosts = await Post.countDocuments(filter);
         const totalPages = Math.ceil(totalPosts / limit);
@@ -186,9 +186,116 @@ const getMyPosts = async (req, res) => {
     }
 };
 
+const updatePost = async (req, res) => {
+    try {
+
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+            return res.status(404).json({
+                message: "Post not found"
+            });
+        }
+
+        if (post.author.toString() !== req.userId) {
+            return res.status(403).json({
+                message: "You are not allowed to update this post"
+            });
+        }
+
+        const {
+            title,
+            content,
+            tags,
+            status
+        } = req.body;
+
+        if (title !== undefined && !title.trim()) {
+            return res.status(400).json({
+                message: "Title cannot be empty"
+            });
+        }
+
+        if (content !== undefined && !content.trim()) {
+            return res.status(400).json({
+                message: "Content cannot be empty"
+            });
+        }
+        if (
+            status !== undefined &&
+            status !== "published" &&
+            status !== "draft"
+        ) {
+            return res.status(400).json({
+                message: "Status must be published or draft"
+            });
+        }
+
+        let validTags = [];
+
+        if (tags !== undefined) {
+
+            if (!Array.isArray(tags)) {
+                return res.status(400).json({
+                    message: "Tags must be an array"
+                });
+            }
+
+            if (tags.length > 0) {
+
+                validTags = await Tag.find({
+                    _id: { $in: tags }
+                });
+
+                if (validTags.length !== tags.length) {
+                    return res.status(400).json({
+                        message: "One or more tags are invalid"
+                    });
+                }
+            }
+        }
+
+        if (title !== undefined) {
+            post.title = title.trim();
+        }
+
+        if (content !== undefined) {
+            post.content = content.trim();
+        }
+
+        if (status !== undefined) {
+            post.status = status;
+        }
+
+        if (tags !== undefined) {
+            post.tags = tags;
+        }
+
+        await post.save();
+
+        const updatedPost = await Post.findById(post._id)
+            .populate("author", "name email")
+            .populate("tags", "name slug");
+
+        return res.status(200).json({
+            message: "Post updated successfully",
+            post: updatedPost
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getPosts,
     getPostBySlug,
-    getMyPosts
+    getMyPosts,
+    updatePost
 };
