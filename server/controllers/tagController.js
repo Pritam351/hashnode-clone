@@ -1,4 +1,5 @@
 const Tag = require("../models/Tag");
+const Post = require("../models/Post");
 
 const createTag = async (req, res, next) => {
     try {
@@ -52,6 +53,57 @@ const createTag = async (req, res, next) => {
     }
 };
 
+const getTags = async (req, res, next) => {
+    try {
+        const tags = await Tag.find().sort({ name: 1 });
+
+        res.status(200).json({
+            count: tags.length,
+            tags
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getTagBySlug = async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+
+        const tag = await Tag.findOne({ slug });
+
+        if (!tag) {
+            return res.status(404).json({
+                message: "Tag not found"
+            });
+        }
+
+        const posts = await Post.find({
+            tags: tag._id,
+            status: "published"
+        })
+            .populate("author", "name email")
+            .populate("tags", "name slug")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            tag: {
+                id: tag._id,
+                name: tag.name,
+                slug: tag.slug
+            },
+            count: posts.length,
+            posts
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
-    createTag
+    createTag,
+    getTags,
+    getTagBySlug
 };
