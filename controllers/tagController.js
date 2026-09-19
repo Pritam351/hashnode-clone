@@ -1,5 +1,6 @@
 const Tag = require("../models/Tag");
 const Post = require("../models/Post");
+const generateSlug = require("../utils/generateSlug");
 
 const createTag = async (req, res, next) => {
     try {
@@ -20,12 +21,7 @@ const createTag = async (req, res, next) => {
             });
         }
 
-        const slug = tagName
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
-
+        const slug = generateSlug(tagName);
 
         const existingTag = await Tag.findOne({
             slug

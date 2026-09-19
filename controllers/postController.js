@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const Tag = require("../models/Tag");
+const generateSlug = require("../utils/generateSlug");
 
 const createPost = async (req, res, next) => {
     try {
@@ -24,11 +25,7 @@ const createPost = async (req, res, next) => {
             });
         }
 
-        const postSlug = title
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
+        const postSlug = generateSlug(title);
 
         const existingPost = await Post.findOne({
             slug: postSlug
@@ -122,7 +119,7 @@ const getPosts = async (req, res, next) => {
 
             filter.tags = tagDoc._id;
         }
-        
+
         if (search) {
             filter.$or = [
                 {
