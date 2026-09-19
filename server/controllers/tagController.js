@@ -1,6 +1,6 @@
 const Tag = require("../models/Tag");
 
-const createTag = async (req, res) => {
+const createTag = async (req, res, next) => {
     try {
 
         const { name } = req.body;
@@ -48,11 +48,7 @@ const createTag = async (req, res) => {
 
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 

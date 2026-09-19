@@ -1,7 +1,7 @@
 const Post = require("../models/Post");
 const Tag = require("../models/Tag");
 
-const createPost = async (req, res) => {
+const createPost = async (req, res, next) => {
     try {
 
         const {
@@ -71,15 +71,11 @@ const createPost = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
-const getPosts = async (req, res) => {
+const getPosts = async (req, res, next) => {
     try {
         const posts = await Post.find({
             status: "published"
@@ -90,15 +86,11 @@ const getPosts = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
-const getPostBySlug = async (req, res) => {
+const getPostBySlug = async (req, res, next) => {
     try {
         const { slug } = req.params;
 
@@ -120,11 +112,7 @@ const getPostBySlug = async (req, res) => {
         })
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
@@ -186,7 +174,7 @@ const getMyPosts = async (req, res) => {
     }
 };
 
-const updatePost = async (req, res) => {
+const updatePost = async (req, res, next) => {
     try {
 
         const post = await Post.findById(req.params.id);
@@ -283,16 +271,11 @@ const updatePost = async (req, res) => {
         });
 
     } catch (error) {
-
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
-const deletePost = async (req, res) => {
+const deletePost = async (req, res, next) => {
     try {
         const post = await Post.findById(req.params.id);
 
@@ -315,12 +298,7 @@ const deletePost = async (req, res) => {
         });
 
     } catch (error) {
-
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
