@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const tagRoutes = require("./routes/tagroutes");
 const postRoutes = require("./routes/postRoutes");
+const userRoutes = require("./routes/userRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -19,6 +20,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/users", userRoutes);
 
 app.use(errorMiddleware);
 
