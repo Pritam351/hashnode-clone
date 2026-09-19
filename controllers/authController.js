@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const generateToken = require("../utils/generateToken");
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
 
@@ -42,13 +42,11 @@ const registerUser = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -90,15 +88,11 @@ const loginUser = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
-const getMe = async (req, res) => {
+const getMe = async (req, res, next) => {
     try {
         const user = await User.findById(req.userId)
             .select("-password");
@@ -114,11 +108,7 @@ const getMe = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Server error"
-        });
+        next(error);
     }
 };
 
