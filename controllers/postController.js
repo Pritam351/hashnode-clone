@@ -77,19 +77,96 @@ const createPost = async (req, res, next) => {
 
 const getPosts = async (req, res, next) => {
     try {
-        const posts = await Post.find({
-            status: "published"
-        });
+        const { tag, author, status, search } = req.query;
 
-        return res.status(200).json({
-            posts
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({
+                message: "Page and limit must be greater than 0"
+            });
+        }
+
+        const filter = {
+            status: "published"
+        };
+
+        // Author filter
+        if (author) {
+            filter.author = author;
+        }
+
+        // Status filter
+        if (status) {
+            if (status !== "published") {
+                return res.status(400).json({
+                    message: "Only published posts are available"
+                });
+            }
+
+            filter.status = status;
+        }
+
+        // Tag filter
+        if (tag) {
+            const tagDoc = await Tag.findOne({
+                slug: tag
+            });
+
+            if (!tagDoc) {
+                return res.status(404).json({
+                    message: "Tag not found"
+                });
+            }
+
+            filter.tags = tagDoc._id;
+        }
+        
+        if (search) {
+            filter.$or = [
+                {
+                    title: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+                {
+                    content: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+            ];
+        }
+
+        const skip = (page - 1) * limit;
+
+        const posts = await Post.find(filter)
+            .populate("author", "name email")
+            .populate("tags", "name slug")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalPosts = await Post.countDocuments(filter);
+
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        res.status(200).json({
+            posts,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalPosts,
+                totalPages
+            }
         });
 
     } catch (error) {
         next(error);
     }
 };
-
 const getPostBySlug = async (req, res, next) => {
     try {
         const { slug } = req.params;
