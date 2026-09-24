@@ -4,6 +4,7 @@ const {
     getPosts, 
     getPostBySlug,
     getMyPosts,
+    getMyPostById,
     updatePost,
     deletePost
 } = require("../controllers/postController");
@@ -17,6 +18,7 @@ const router = express.Router();
 router.post("/", protect, validatePost, createPost);
 router.get("/", getPosts);
 router.get("/my-posts", protect, getMyPosts);
+router.get("/my-posts/:id", protect, getMyPostById);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.get("/:slug", getPostBySlug);
