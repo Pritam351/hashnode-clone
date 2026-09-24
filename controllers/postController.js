@@ -248,6 +248,29 @@ const getMyPosts = async (req, res) => {
     }
 };
 
+const getMyPostById = async (req, res, next) => {
+    try {
+        const post = await Post.findOne({
+            _id: req.params.id,
+            author: req.userId
+        })
+            .populate("author", "name email")
+            .populate("tags", "name slug");
+
+        if (!post) {
+            return res.status(404).json({
+                message: "Post not found"
+            });
+        }
+
+        return res.status(200).json({
+            post
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const updatePost = async (req, res, next) => {
     try {
 
@@ -268,6 +291,7 @@ const updatePost = async (req, res, next) => {
         const {
             title,
             content,
+            coverImage,
             tags,
             status
         } = req.body;
@@ -323,6 +347,10 @@ const updatePost = async (req, res, next) => {
 
         if (content !== undefined) {
             post.content = content.trim();
+        }
+
+        if (coverImage !== undefined) {
+            post.coverImage = coverImage || "";
         }
 
         if (status !== undefined) {
@@ -381,6 +409,7 @@ module.exports = {
     getPosts,
     getPostBySlug,
     getMyPosts,
+    getMyPostById,
     updatePost,
     deletePost
 };

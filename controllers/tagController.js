@@ -52,10 +52,40 @@ const createTag = async (req, res, next) => {
 const getTags = async (req, res, next) => {
     try {
         const tags = await Tag.find().sort({ name: 1 });
+        const postCounts = await Post.aggregate([
+            {
+                $match: {
+                    status: "published"
+                }
+            },
+            {
+                $unwind: "$tags"
+            },
+            {
+                $group: {
+                    _id: "$tags",
+                    postCount: {
+                        $sum: 1
+                    }
+                }
+            }
+        ]);
+
+        const postCountByTagId = new Map(
+            postCounts.map(({ _id, postCount }) => [
+                _id.toString(),
+                postCount
+            ])
+        );
+
+        const tagsWithPostCounts = tags.map(tag => ({
+            ...tag.toObject(),
+            postCount: postCountByTagId.get(tag._id.toString()) || 0
+        }));
 
         res.status(200).json({
             count: tags.length,
-            tags
+            tags: tagsWithPostCounts
         });
 
     } catch (error) {
