@@ -8,6 +8,7 @@
     <title>DevHaven | Developer Publishing</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/feed.css">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -15,14 +16,35 @@
     <div id="navbar-root"></div>
 
     <main id="main-content" class="app-main" tabindex="-1">
-        <section class="foundation-panel panel" aria-labelledby="foundation-heading">
-            <p class="eyebrow">Frontend foundation</p>
-            <h1 id="foundation-heading">Developer publishing, ready for its first feature.</h1>
-            <p class="foundation-panel__copy">
-                The shared shell, responsive navigation, feedback components, and API client are ready.
-                Content and account features will be added in later phases.
-            </p>
-        </section>
+        <div class="feed-container">
+            <header class="feed-header">
+                <h1 class="feed-header__title">Latest Posts</h1>
+                <div class="search-bar">
+                    <label for="search-input" class="sr-only">Search posts</label>
+                    <input
+                        type="search"
+                        id="search-input"
+                        class="search-bar__input"
+                        placeholder="Search posts..."
+                        autocomplete="off"
+                    >
+                    <button
+                        id="clear-search"
+                        class="search-bar__clear"
+                        aria-label="Clear search"
+                        hidden
+                    >×</button>
+                </div>
+            </header>
+
+            <div id="posts-container" role="region" aria-live="polite" aria-label="Posts feed">
+                <!-- Posts will be rendered here -->
+            </div>
+
+            <div id="pagination-container">
+                <!-- Pagination will be rendered here -->
+            </div>
+        </div>
     </main>
 
     <footer class="site-footer">
