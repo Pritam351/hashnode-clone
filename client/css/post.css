@@ -46,14 +46,277 @@
 }
 
 .post-detail__body {
-    max-width: 62ch;
+    max-width: 68ch;
     margin-bottom: var(--space-7);
-    color: var(--color-text-muted);
+    color: var(--color-text);
     font-size: 1.05rem;
-    line-height: 1.8;
-    white-space: pre-wrap;
+    line-height: 1.75;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+/* Markdown Typography */
+.post-detail__body h1,
+.post-detail__body h2,
+.post-detail__body h3,
+.post-detail__body h4,
+.post-detail__body h5,
+.post-detail__body h6 {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.post-detail__body h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--space-3);
+}
+
+.post-detail__body h2 {
+    font-size: 1.65rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-2);
+}
+
+.post-detail__body h3 {
+    font-size: 1.4rem;
+}
+
+.post-detail__body h4 {
+    font-size: 1.2rem;
+}
+
+.post-detail__body h5 {
+    font-size: 1.05rem;
+}
+
+.post-detail__body h6 {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+.post-detail__body p {
+    margin-bottom: var(--space-4);
+    line-height: 1.8;
+}
+
+.post-detail__body a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.2em;
+    transition: color var(--transition-fast);
+}
+
+.post-detail__body a:hover {
+    color: var(--color-accent-strong);
+}
+
+.post-detail__body strong {
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.post-detail__body em {
+    font-style: italic;
+}
+
+.post-detail__body del {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Lists */
+.post-detail__body ul,
+.post-detail__body ol {
+    margin-bottom: var(--space-4);
+    padding-left: 1.75rem;
+}
+
+.post-detail__body ul {
+    list-style-type: disc;
+}
+
+.post-detail__body ol {
+    list-style-type: decimal;
+}
+
+.post-detail__body li {
+    margin-bottom: var(--space-2);
+    line-height: 1.7;
+}
+
+.post-detail__body li > ul,
+.post-detail__body li > ol {
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+/* Blockquotes */
+.post-detail__body blockquote {
+    margin: var(--space-5) 0;
+    padding: var(--space-4) var(--space-5);
+    border-left: 4px solid var(--color-accent);
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.post-detail__body blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Horizontal Rules */
+.post-detail__body hr {
+    margin: var(--space-6) 0;
+    border: 0;
+    border-top: 2px solid var(--color-border);
+}
+
+/* Inline Code */
+.post-detail__body code:not(pre code) {
+    padding: 0.15em 0.4em;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--color-accent);
+    word-break: break-word;
+}
+
+/* Code Block Wrapper */
+.post-detail__body .code-block-wrapper {
+    margin: var(--space-5) 0;
+    border-radius: var(--radius-md);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.post-detail__body .code-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.post-detail__body .code-block__lang {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.post-detail__body .code-block__copy-btn {
+    padding: 0.3rem 0.75rem;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.post-detail__body .code-block__copy-btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+}
+
+.post-detail__body .code-block__copy-btn:active {
+    background: var(--color-surface-active);
+}
+
+.post-detail__body .code-block__copy-btn--copied {
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.post-detail__body .copy-icon {
+    font-size: 1rem;
+}
+
+/* Code Blocks */
+.post-detail__body pre {
+    margin: 0;
+    padding: var(--space-4);
+    background: var(--color-code-bg);
+    overflow-x: auto;
+    line-height: 1.6;
+}
+
+.post-detail__body pre code {
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    display: block;
+}
+
+/* Tables */
+.post-detail__body table {
+    width: 100%;
+    margin: var(--space-5) 0;
+    border-collapse: collapse;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.post-detail__body thead {
+    background: var(--color-surface);
+}
+
+.post-detail__body th,
+.post-detail__body td {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    text-align: left;
+}
+
+.post-detail__body th {
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.post-detail__body td {
+    color: var(--color-text-muted);
+}
+
+.post-detail__body tbody tr:hover {
+    background: var(--color-surface-hover);
+}
+
+/* Images */
+.post-detail__body img {
+    max-width: 100%;
+    height: auto;
+    margin: var(--space-5) 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    display: block;
+}
+
+/* Task Lists */
+.post-detail__body input[type="checkbox"] {
+    margin-right: var(--space-2);
+    cursor: pointer;
 }
 
 @media (max-width: 48rem) {

@@ -2,6 +2,7 @@ import { getPostBySlug } from "../api/postApi.js";
 import { renderLoader } from "../components/loader.js";
 import { renderErrorMessage } from "../components/errorMessage.js";
 import { formatDate } from "../utils/format.js";
+import { renderMarkdown, initCodeBlockActions } from "../utils/markdown.js";
 
 function getSlugFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -67,8 +68,11 @@ function renderPost(post, container) {
 
     const body = document.createElement("div");
     body.className = "post-detail__body";
-    body.textContent = post.content;
+    body.innerHTML = renderMarkdown(post.content);
     container.appendChild(body);
+
+    // Initialize code block copy buttons
+    initCodeBlockActions(body);
 
     document.title = `${post.title} | DevHaven`;
 }
