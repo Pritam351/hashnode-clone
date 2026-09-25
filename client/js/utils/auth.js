@@ -7,14 +7,14 @@ export function isAuthenticated() {
 
 export function logout() {
     clearAuth();
-    window.location.href = "/index.html";
+    window.location.href = "/client/index.html";
 }
 
 export async function requireAuth() {
     const token = getToken();
 
     if (!token) {
-        window.location.href = "/pages/login.html";
+        window.location.href = "/client/pages/login.html";
         return null;
     }
 
@@ -24,12 +24,12 @@ export async function requireAuth() {
     } catch (error) {
         console.error("Token validation failed:", error);
         clearAuth();
-        window.location.href = "/pages/login.html";
+        window.location.href = "/client/pages/login.html";
         return null;
     }
 }
 
-export function redirectIfAuthenticated(redirectTo = "/index.html") {
+export function redirectIfAuthenticated(redirectTo = "/client/index.html") {
     if (isAuthenticated()) {
         window.location.href = redirectTo;
     }

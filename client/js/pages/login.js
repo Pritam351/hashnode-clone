@@ -47,6 +47,12 @@ function validateForm() {
         return false;
     }
 
+    if (!/\S/.test(password)) {
+        showError("Password cannot be empty or only whitespace");
+        passwordInput.focus();
+        return false;
+    }
+
     return true;
 }
 
@@ -75,7 +81,7 @@ async function handleSubmit(event) {
         setToken(response.token);
         setCurrentUser(response.user);
 
-        window.location.href = "/index.html";
+        window.location.href = "/client/index.html";
 
     } catch (error) {
         console.error("Login error:", error);

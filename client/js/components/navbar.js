@@ -3,21 +3,21 @@ import { isAuthenticated, logout } from "../utils/auth.js";
 function getNavigationItems(authenticated) {
     if (authenticated) {
         return [
-            { label: "Home", href: "/index.html", key: "home" },
-            { label: "Tags", href: "/pages/tags.html", key: "tags" },
-            { label: "Dashboard", href: "/pages/dashboard.html", key: "dashboard" },
-            { label: "Create Post", href: "/pages/editor.html", key: "editor" },
-            { label: "Profile", href: "/pages/profile.html", key: "profile" },
-            { label: "Settings", href: "/pages/settings.html", key: "settings" },
+            { label: "Home", href: "/client/index.html", key: "home" },
+            { label: "Tags", href: "/client/pages/tags.html", key: "tags" },
+            { label: "Dashboard", href: "/client/pages/dashboard.html", key: "dashboard" },
+            { label: "Create Post", href: "/client/pages/editor.html", key: "editor" },
+            { label: "Profile", href: "/client/pages/profile.html", key: "profile" },
+            { label: "Settings", href: "/client/pages/settings.html", key: "settings" },
             { label: "Logout", href: "#", key: "logout", action: "logout" }
         ];
     }
 
     return [
-        { label: "Home", href: "/index.html", key: "home" },
-        { label: "Tags", href: "/pages/tags.html", key: "tags" },
-        { label: "Login", href: "/pages/login.html", key: "login" },
-        { label: "Register", href: "/pages/register.html", key: "register" }
+        { label: "Home", href: "/client/index.html", key: "home" },
+        { label: "Tags", href: "/client/pages/tags.html", key: "tags" },
+        { label: "Login", href: "/client/pages/login.html", key: "login" },
+        { label: "Register", href: "/client/pages/register.html", key: "register" }
     ];
 }
 
@@ -73,7 +73,7 @@ export function renderNavbar(mountElement) {
     header.className = "site-nav";
     inner.className = "site-nav__inner";
     brand.className = "site-nav__brand";
-    brand.href = "/index.html";
+    brand.href = "/client/index.html";
     brand.setAttribute("aria-label", "DevHaven home");
     brandMark.className = "site-nav__brand-mark";
     brandMark.setAttribute("aria-hidden", "true");

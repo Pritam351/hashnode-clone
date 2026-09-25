@@ -67,6 +67,12 @@ function validateForm() {
         return false;
     }
 
+    if (!/\S/.test(password)) {
+        showError("Password cannot be only whitespace");
+        passwordInput.focus();
+        return false;
+    }
+
     if (!emailInput.validity.valid) {
         showError("Please enter a valid email address");
         emailInput.focus();
@@ -98,7 +104,7 @@ async function handleSubmit(event) {
         showSuccess("Registration successful! Redirecting to login...");
 
         setTimeout(() => {
-            window.location.href = "/pages/login.html";
+            window.location.href = "/client/pages/login.html";
         }, 1500);
 
     } catch (error) {

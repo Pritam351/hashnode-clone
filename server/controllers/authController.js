@@ -5,16 +5,30 @@ const generateToken = require("../utils/generateToken");
 const registerUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
+        
+        const trimmedName = name?.trim();
+        const trimmedEmail = email?.trim();
 
-        // validation
-        if (!name || !email || !password) {
+        if (!trimmedName || !trimmedEmail || !password) {
             return res.status(400).json({
                 message: "All fields are required"
             });
         }
 
+        if (!/\S/.test(password)) {
+            return res.status(400).json({
+                message: "Password cannot be only whitespace"
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters"
+            });
+        }
+
         // check existing user
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: trimmedEmail });
 
         if (existingUser) {
             return res.status(409).json({
@@ -27,8 +41,8 @@ const registerUser = async (req, res, next) => {
 
         // create user
         const user = await User.create({
-            name,
-            email,
+            name: trimmedName,
+            email: trimmedEmail,
             password: hashedPassword
         });
 
@@ -50,13 +64,21 @@ const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        if (!email || !password) {
+        const trimmedEmail = email?.trim();
+
+        if (!trimmedEmail || !password) {
             return res.status(400).json({
                 message: "Email and password are required"
             });
         }
 
-        const user = await User.findOne({ email });
+        if (!/\S/.test(password)) {
+            return res.status(400).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        const user = await User.findOne({ email: trimmedEmail });
 
         if (!user) {
             return res.status(401).json({
