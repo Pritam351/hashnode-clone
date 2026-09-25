@@ -1,11 +1,27 @@
-const navigationItems = [
-    { label: "Home", href: "/index.html", key: "home" },
-    { label: "Tags", href: "/pages/tags.html", key: "tags" },
-    { label: "Login", href: "/pages/login.html", key: "login" },
-    { label: "Register", href: "/pages/register.html", key: "register" }
-];
+import { isAuthenticated, logout } from "../utils/auth.js";
 
-function getCurrentPageKey() {
+function getNavigationItems(authenticated) {
+    if (authenticated) {
+        return [
+            { label: "Home", href: "/index.html", key: "home" },
+            { label: "Tags", href: "/pages/tags.html", key: "tags" },
+            { label: "Dashboard", href: "/pages/dashboard.html", key: "dashboard" },
+            { label: "Create Post", href: "/pages/editor.html", key: "editor" },
+            { label: "Profile", href: "/pages/profile.html", key: "profile" },
+            { label: "Settings", href: "/pages/settings.html", key: "settings" },
+            { label: "Logout", href: "#", key: "logout", action: "logout" }
+        ];
+    }
+
+    return [
+        { label: "Home", href: "/index.html", key: "home" },
+        { label: "Tags", href: "/pages/tags.html", key: "tags" },
+        { label: "Login", href: "/pages/login.html", key: "login" },
+        { label: "Register", href: "/pages/register.html", key: "register" }
+    ];
+}
+
+function getCurrentPageKey(navigationItems) {
     const path = window.location.pathname.replace(/\/$/, "");
 
     if (!path || path === "/index.html") {
@@ -15,7 +31,7 @@ function getCurrentPageKey() {
     return navigationItems.find(item => path.endsWith(item.href))?.key;
 }
 
-function createNavLink({ label, href, key }, currentPageKey) {
+function createNavLink({ label, href, key, action }, currentPageKey) {
     const link = document.createElement("a");
 
     link.className = "site-nav__link";
@@ -26,6 +42,13 @@ function createNavLink({ label, href, key }, currentPageKey) {
         link.setAttribute("aria-current", "page");
     }
 
+    if (action === "logout") {
+        link.addEventListener("click", (event) => {
+            event.preventDefault();
+            logout();
+        });
+    }
+
     return link;
 }
 
@@ -34,7 +57,9 @@ export function renderNavbar(mountElement) {
         throw new Error("Navbar mount element was not found.");
     }
 
-    const currentPageKey = getCurrentPageKey();
+    const authenticated = isAuthenticated();
+    const navigationItems = getNavigationItems(authenticated);
+    const currentPageKey = getCurrentPageKey(navigationItems);
     const header = document.createElement("header");
     const inner = document.createElement("div");
     const brand = document.createElement("a");

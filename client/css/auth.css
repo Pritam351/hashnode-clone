@@ -1,0 +1,119 @@
+.auth-container {
+    display: grid;
+    place-items: center;
+    min-height: calc(100vh - 9rem);
+}
+
+.auth-panel {
+    width: min(100%, 28rem);
+    padding: clamp(2rem, 5vw, 3rem);
+}
+
+.auth-panel__header {
+    margin-bottom: var(--space-6);
+    text-align: center;
+}
+
+.auth-panel__heading {
+    margin-bottom: var(--space-2);
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+.auth-panel__subheading {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.auth-form {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.auth-form__fields {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.auth-form__actions {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.auth-form__button {
+    width: 100%;
+    min-height: 3rem;
+    font-size: 1rem;
+}
+
+.auth-form__help-text {
+    margin-top: var(--space-1);
+    color: var(--color-text-subtle);
+    font-size: 0.88rem;
+}
+
+.auth-form__links {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.auth-form__link-text {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.94rem;
+}
+
+.auth-form__link-text a {
+    color: var(--color-accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-form__link-text a:hover {
+    text-decoration: underline;
+}
+
+.auth-form__message {
+    margin-bottom: var(--space-4);
+}
+
+.success-message {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid rgb(126 215 170 / 45%);
+    border-radius: var(--radius-md);
+    background: rgb(126 215 170 / 8%);
+    color: #d4f5e5;
+}
+
+.success-message__title {
+    font-weight: 800;
+}
+
+.success-message__text {
+    margin: 0;
+    color: #c1f0d9;
+}
+
+.button-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+@media (max-width: 42rem) {
+    .auth-container {
+        min-height: calc(100vh - 8rem);
+    }
+
+    .auth-panel {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .auth-panel__header {
+        margin-bottom: var(--space-5);
+    }
+}

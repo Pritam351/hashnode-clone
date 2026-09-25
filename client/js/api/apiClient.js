@@ -24,6 +24,11 @@ async function parseResponse(response) {
     return response.text();
 }
 
+function getAuthHeaders() {
+    const token = localStorage.getItem("auth_token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function request(path, options = {}) {
     const {
         method = "GET",
@@ -35,6 +40,7 @@ async function request(path, options = {}) {
 
     const requestHeaders = {
         Accept: "application/json",
+        ...getAuthHeaders(),
         ...headers
     };
 
