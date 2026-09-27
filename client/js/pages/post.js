@@ -74,6 +74,11 @@ function renderPost(post, container) {
     // Initialize code block copy buttons
     initCodeBlockActions(body);
 
+    // Run Prism highlighting pass for any dynamic or autoloader blocks
+    if (window.Prism && typeof window.Prism.highlightAllUnder === "function") {
+        window.Prism.highlightAllUnder(body);
+    }
+
     document.title = `${post.title} | DevHaven`;
 }
 

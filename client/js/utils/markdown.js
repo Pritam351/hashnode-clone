@@ -23,18 +23,41 @@ function createRenderer() {
 
     const renderer = new window.marked.Renderer();
 
-    renderer.code = function ({ text, lang }) {
+    renderer.code = function (codeOrToken, infoString) {
+        let text = "";
+        let lang = "";
+
+        // Handle both Marked v12 token object and legacy (code, infostring) positional arguments
+        if (typeof codeOrToken === "object" && codeOrToken !== null) {
+            text = codeOrToken.text || "";
+            lang = codeOrToken.lang || "";
+        } else {
+            text = typeof codeOrToken === "string" ? codeOrToken : "";
+            lang = typeof infoString === "string" ? infoString : "";
+        }
+
         const rawLanguage = (lang || "").trim().toLowerCase();
         // Map common aliases
         const langMap = {
             js: "javascript",
+            javascript: "javascript",
             ts: "typescript",
+            typescript: "typescript",
             py: "python",
+            python: "python",
             sh: "bash",
             shell: "bash",
+            bash: "bash",
+            zsh: "bash",
             html: "markup",
             xml: "markup",
-            md: "markdown"
+            svg: "markup",
+            markup: "markup",
+            md: "markdown",
+            markdown: "markdown",
+            json: "json",
+            css: "css",
+            sql: "sql"
         };
         const language = langMap[rawLanguage] || rawLanguage;
 
@@ -102,14 +125,14 @@ export function renderMarkdown(markdownText) {
             options.renderer = renderer;
         }
 
-        window.marked.use(options);
-        const rawHtml = window.marked.parse(markdownText);
+        const rawHtml = window.marked.parse(markdownText, options);
 
         // Sanitize with DOMPurify
         if (window.DOMPurify) {
             return window.DOMPurify.sanitize(rawHtml, {
                 USE_PROFILES: { html: true },
-                ADD_ATTR: ["target", "rel", "data-copy-code", "class", "aria-label", "type"]
+                ADD_TAGS: ["button", "span", "pre", "code", "div"],
+                ADD_ATTR: ["target", "rel", "data-copy-code", "class", "aria-label", "aria-hidden", "type"]
             });
         }
 
