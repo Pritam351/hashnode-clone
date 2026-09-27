@@ -53,9 +53,13 @@ export function createPostCard(post) {
         tagsContainer.className = "post-card__tags";
 
         post.tags.forEach(tag => {
-            const tagPill = document.createElement("span");
+            const tagPill = document.createElement("a");
             tagPill.className = "tag-pill tag-pill--small";
+            tagPill.href = `/client/index.html?tag=${tag.slug}`;
             tagPill.textContent = tag.name;
+            tagPill.addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
             tagsContainer.appendChild(tagPill);
         });
 

@@ -5,6 +5,7 @@ import { renderErrorMessage } from "../components/errorMessage.js";
 
 let currentPage = 1;
 let currentSearch = "";
+let currentTag = "";
 let debounceTimer = null;
 
 function debounce(func, delay) {
@@ -17,12 +18,13 @@ function debounce(func, delay) {
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
     return {
-        page: parseInt(params.get("page")) || 1,
-        search: params.get("search") || ""
+        page: parseInt(params.get("page"), 10) || 1,
+        search: params.get("search") || "",
+        tag: params.get("tag") || ""
     };
 }
 
-function updateUrl(page, search) {
+function updateUrl(page, search, tag, replace = false) {
     const params = new URLSearchParams();
 
     if (page > 1) {
@@ -33,11 +35,61 @@ function updateUrl(page, search) {
         params.set("search", search);
     }
 
+    if (tag) {
+        params.set("tag", tag);
+    }
+
     const newUrl = params.toString()
         ? `${window.location.pathname}?${params.toString()}`
         : window.location.pathname;
 
-    window.history.pushState({}, "", newUrl);
+    const currentUrl = `${window.location.pathname}${window.location.search}`;
+    if (currentUrl !== newUrl) {
+        if (replace) {
+            window.history.replaceState({}, "", newUrl);
+        } else {
+            window.history.pushState({}, "", newUrl);
+        }
+    }
+}
+
+function updateTagFilterUI(tag) {
+    const activeTagContainer = document.querySelector("#active-tag-container");
+    const feedTitle = document.querySelector("#feed-title");
+
+    if (feedTitle) {
+        feedTitle.textContent = tag ? `Posts tagged #${tag}` : "Latest Posts";
+    }
+
+    if (!activeTagContainer) return;
+
+    if (!tag) {
+        activeTagContainer.hidden = true;
+        activeTagContainer.innerHTML = "";
+        return;
+    }
+
+    activeTagContainer.hidden = false;
+    activeTagContainer.innerHTML = "";
+
+    const badge = document.createElement("div");
+    badge.className = "active-tag-badge";
+
+    const label = document.createElement("span");
+    label.innerHTML = `Filtered by: <strong>#${tag}</strong>`;
+    badge.appendChild(label);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "active-tag-clear";
+    clearBtn.setAttribute("aria-label", "Remove tag filter");
+    clearBtn.textContent = "×";
+    clearBtn.addEventListener("click", () => {
+        loadPosts(1, currentSearch, "");
+    });
+    badge.appendChild(clearBtn);
+
+    activeTagContainer.appendChild(badge);
 }
 
 function renderPosts(posts, container) {
@@ -48,9 +100,15 @@ function renderPosts(posts, container) {
         emptyState.className = "feed-empty";
 
         const message = document.createElement("p");
-        message.textContent = currentSearch
-            ? `No posts found for "${currentSearch}"`
-            : "No posts yet. Check back soon!";
+        if (currentTag && currentSearch) {
+            message.textContent = `No posts found for "${currentSearch}" tagged with #${currentTag}`;
+        } else if (currentTag) {
+            message.textContent = `No posts found tagged with #${currentTag}`;
+        } else if (currentSearch) {
+            message.textContent = `No posts found for "${currentSearch}"`;
+        } else {
+            message.textContent = "No posts yet. Check back soon!";
+        }
 
         emptyState.appendChild(message);
         container.appendChild(emptyState);
@@ -85,7 +143,7 @@ function renderPagination(pagination, container) {
     prevButton.disabled = pagination.currentPage === 1;
     prevButton.addEventListener("click", () => {
         if (pagination.currentPage > 1) {
-            loadPosts(pagination.currentPage - 1, currentSearch);
+            loadPosts(pagination.currentPage - 1, currentSearch, currentTag);
         }
     });
 
@@ -99,7 +157,7 @@ function renderPagination(pagination, container) {
     nextButton.disabled = pagination.currentPage === pagination.totalPages;
     nextButton.addEventListener("click", () => {
         if (pagination.currentPage < pagination.totalPages) {
-            loadPosts(pagination.currentPage + 1, currentSearch);
+            loadPosts(pagination.currentPage + 1, currentSearch, currentTag);
         }
     });
 
@@ -107,7 +165,7 @@ function renderPagination(pagination, container) {
     container.appendChild(paginationEl);
 }
 
-async function loadPosts(page = 1, search = "") {
+async function loadPosts(page = 1, search = "", tag = "", replaceUrl = false) {
     const postsContainer = document.querySelector("#posts-container");
     const paginationContainer = document.querySelector("#pagination-container");
 
@@ -117,8 +175,10 @@ async function loadPosts(page = 1, search = "") {
 
     currentPage = page;
     currentSearch = search;
+    currentTag = tag;
 
-    updateUrl(page, search);
+    updateUrl(page, search, tag, replaceUrl);
+    updateTagFilterUI(tag);
 
     renderLoader(postsContainer, "Loading posts...");
     paginationContainer.innerHTML = "";
@@ -129,7 +189,8 @@ async function loadPosts(page = 1, search = "") {
         const data = await getPosts({
             page,
             limit: 10,
-            search: search || undefined
+            search: search || undefined,
+            tag: tag || undefined
         });
 
         renderPosts(data.posts, postsContainer);
@@ -137,10 +198,16 @@ async function loadPosts(page = 1, search = "") {
 
     } catch (error) {
         console.error("Failed to load posts:", error);
+
+        const title = error.status === 404 ? "Tag not found" : "Failed to load posts";
+        const message = error.status === 404
+            ? `Tag "${tag}" does not exist.`
+            : error.message || "Unable to load posts. Please try again later.";
+
         renderErrorMessage(
             postsContainer,
-            error.message || "Unable to load posts. Please try again later.",
-            "Failed to load posts"
+            message,
+            title
         );
     }
 }
@@ -157,7 +224,7 @@ function updateClearButtonVisibility() {
 function handleSearch(event) {
     const searchQuery = event.target.value.trim();
     updateClearButtonVisibility();
-    loadPosts(1, searchQuery);
+    loadPosts(1, searchQuery, currentTag);
 }
 
 function handleClearSearch() {
@@ -165,7 +232,7 @@ function handleClearSearch() {
     if (searchInput) {
         searchInput.value = "";
         updateClearButtonVisibility();
-        loadPosts(1, "");
+        loadPosts(1, "", currentTag);
     }
 }
 
@@ -178,7 +245,7 @@ export function initFeed() {
         return;
     }
 
-    const { page, search } = getUrlParams();
+    const { page, search, tag } = getUrlParams();
 
     if (search) {
         searchInput.value = search;
@@ -192,5 +259,14 @@ export function initFeed() {
         clearButton.addEventListener("click", handleClearSearch);
     }
 
-    loadPosts(page, search);
+    window.addEventListener("popstate", () => {
+        const params = getUrlParams();
+        if (searchInput) {
+            searchInput.value = params.search;
+            updateClearButtonVisibility();
+        }
+        loadPosts(params.page, params.search, params.tag, true);
+    });
+
+    loadPosts(page, search, tag);
 }
