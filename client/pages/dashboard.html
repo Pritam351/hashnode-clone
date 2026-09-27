@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your DevHaven dashboard">
+    <meta name="theme-color" content="#10131a">
+    <title>Dashboard | DevHaven</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div id="navbar-root"></div>
+
+    <main id="main-content" class="app-main" tabindex="-1">
+        <section class="dashboard-section">
+            <header class="dashboard-section__header">
+                <h1 class="dashboard-section__title">Dashboard</h1>
+                <p class="dashboard-section__description">Manage your stories</p>
+            </header>
+
+            <div class="dashboard-header-actions">
+                <a href="/client/pages/editor.html" class="btn btn-primary">Write Story</a>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-item" id="stat-all">
+                    <span class="stat-label">All Posts</span>
+                    <span class="stat-value" id="stat-all-value">0</span>
+                </div>
+                <div class="stat-item" id="stat-published">
+                    <span class="stat-label">Published</span>
+                    <span class="stat-value" id="stat-published-value">0</span>
+                </div>
+                <div class="stat-item" id="stat-draft">
+                    <span class="stat-label">Drafts</span>
+                    <span class="stat-value" id="stat-draft-value">0</span>
+                </div>
+            </div>
+
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-status="all">All Posts</button>
+                <button class="tab-btn" data-status="published">Published</button>
+                <button class="tab-btn" data-status="draft">Drafts</button>
+            </div>
+
+            <div id="dashboard-loader" class="loader-container"></div>
+            <div id="dashboard-error" class="error-container"></div>
+
+            <div id="posts-container" class="posts-container">
+                <!-- Posts will be rendered here -->
+            </div>
+
+            <div id="pagination-container" class="pagination-container">
+                <!-- Pagination controls will be rendered here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-dialog">
+            <header class="modal-header">
+                <h2 class="modal-title">Delete Post</h2>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </header>
+            <div class="modal-body">
+                <p id="delete-modal-text">Are you sure you want to delete this post?</p>
+                <p id="delete-modal-post-title" class="modal-post-title"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="delete-modal-cancel">Cancel</button>
+                <button class="btn btn-danger" id="delete-modal-confirm">Delete Post</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>DevHaven is a place to share what you learn.</p>
+    </footer>
+
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/dashboard.js"></script>
+</body>
+</html>

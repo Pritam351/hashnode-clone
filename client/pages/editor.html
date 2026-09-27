@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Write or edit your story on DevHaven">
+    <meta name="theme-color" content="#10131a">
+    <title>Editor | DevHaven</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/editor.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div id="navbar-root"></div>
+
+    <main id="main-content" class="app-main" tabindex="-1">
+        <section class="editor-section">
+            <header class="editor-section__header">
+                <h1 class="editor-section__title" id="editor-title">New Story</h1>
+                <p class="editor-section__description">Create and format your story</p>
+            </header>
+
+            <form id="editor-form" class="editor-form">
+                <div class="editor-form-group">
+                    <label for="editor-title-input" class="form-label">Title</label>
+                    <input type="text" id="editor-title-input" class="form-input" placeholder="Enter your story title" required>
+                </div>
+
+                <div class="editor-form-group">
+                    <label for="editor-cover-input" class="form-label">Cover Image URL (optional)</label>
+                    <input type="url" id="editor-cover-input" class="form-input" placeholder="https://example.com/cover.jpg">
+                </div>
+
+                <div class="editor-form-group">
+                    <label for="editor-tags-input" class="form-label">Tags</label>
+                    <input type="text" id="editor-tags-input" class="form-input" placeholder="javascript, webdev, tutorial">
+                    <p class="form-help">Separate tags with commas</p>
+                </div>
+
+                <div class="editor-form-group">
+                    <label for="editor-status" class="form-label">Status</label>
+                    <select id="editor-status" class="form-select">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </select>
+                </div>
+
+                <div class="editor-form-group">
+                    <label for="editor-content" class="form-label">Content (Markdown)</label>
+                    <textarea id="editor-content" class="form-textarea" placeholder="Write your story in Markdown..." required></textarea>
+                </div>
+
+                <div class="editor-preview-toggle">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="editor-preview-toggle" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label-text">Show Preview</span>
+                    </label>
+                </div>
+
+                <div id="editor-preview-container" class="editor-preview-container hidden">
+                    <div class="editor-preview-header">
+                        <h3>Live Preview</h3>
+                    </div>
+                    <div id="editor-preview" class="editor-preview"></div>
+                </div>
+
+                <div class="editor-form-actions">
+                    <button type="button" id="editor-save-draft" class="btn btn-outline">Save as Draft</button>
+                    <button type="button" id="editor-publish" class="btn btn-primary">Publish</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>DevHaven is a place to share what you learn.</p>
+    </footer>
+
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/editor.js"></script>
+</body>
+</html>
