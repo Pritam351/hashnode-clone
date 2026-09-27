@@ -18,13 +18,14 @@
     <main id="main-content" class="app-main" tabindex="-1">
         <section class="dashboard-section">
             <header class="dashboard-section__header">
-                <h1 class="dashboard-section__title">Dashboard</h1>
-                <p class="dashboard-section__description">Manage your stories</p>
+                <div class="dashboard-section__header-content">
+                    <h1 class="dashboard-section__title">Dashboard</h1>
+                    <p class="dashboard-section__description">Manage your posts and track your writing journey</p>
+                </div>
+                <div class="dashboard-header-actions">
+                    <a href="/client/pages/editor.html" class="btn btn-primary">Create a Post</a>
+                </div>
             </header>
-
-            <div class="dashboard-header-actions">
-                <a href="/client/pages/editor.html" class="btn btn-primary">Write Story</a>
-            </div>
 
             <div class="dashboard-stats">
                 <div class="stat-item" id="stat-all">
@@ -42,9 +43,9 @@
             </div>
 
             <div class="dashboard-tabs">
-                <button class="tab-btn active" data-status="all">All Posts</button>
-                <button class="tab-btn" data-status="published">Published</button>
-                <button class="tab-btn" data-status="draft">Drafts</button>
+                <button class="tab-btn active" data-status="all" aria-pressed="true">All Posts</button>
+                <button class="tab-btn" data-status="published" aria-pressed="false">Published</button>
+                <button class="tab-btn" data-status="draft" aria-pressed="false">Drafts</button>
             </div>
 
             <div id="dashboard-loader" class="loader-container"></div>

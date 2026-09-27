@@ -229,7 +229,7 @@ function renderEmptyState() {
     <div class="empty-state">
       <h3>No posts yet</h3>
       <p>Start writing your first story to share with the world.</p>
-      <a href="/client/pages/editor.html" class="btn btn-primary">Write Your First Story</a>
+      <a href="/client/pages/editor.html" class="btn btn-primary">Create a Post</a>
     </div>
   `;
 }
