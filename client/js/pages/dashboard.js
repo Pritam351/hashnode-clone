@@ -107,16 +107,19 @@ async function loadDashboardData() {
     const statsResponse = await getMyPosts({ status: undefined, page: 1, limit: 1000 }); // Fetch all to get counts
     const postsResponse = await getMyPosts({ status: currentStatus, page: currentPage, limit });
 
+    // Backend returns { posts, pagination } format
+    const allPostsData = statsResponse.posts || [];
+
     // Process stats
     totalStats = {
-      all: statsResponse.data.length,
-      published: statsResponse.data.filter(p => p.status === "published").length,
-      draft: statsResponse.data.filter(p => p.status === "draft").length
+      all: allPostsData.length,
+      published: allPostsData.filter(p => p.status === "published").length,
+      draft: allPostsData.filter(p => p.status === "draft").length
     };
     updateStatsDisplay();
 
     // Process posts for current status and page
-    allPosts = statsResponse.data; // Cache all posts for client-side filtering if needed
+    allPosts = allPostsData; // Cache all posts for client-side filtering if needed
     const filteredPosts = allPosts.filter(post =>
       currentStatus === "all" || post.status === currentStatus
     );
@@ -170,7 +173,7 @@ function createPostCard(post) {
 
   const dateInfo = document.createElement("span");
   dateInfo.className = "post-card__date";
-  const date = new post.createdAt ? new Date(post.createdAt) : new Date();
+  const date = post.createdAt ? new Date(post.createdAt) : new Date();
   dateInfo.textContent = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
   const readTimeInfo = document.createElement("span");

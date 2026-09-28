@@ -38,6 +38,10 @@ export async function updatePost(id, postData) {
     return apiClient.put(`/posts/${id}`, postData);
 }
 
+export async function getMyPostById(id) {
+    return apiClient.get(`/posts/my-posts/${id}`);
+}
+
 export async function deletePost(id) {
     return apiClient.delete(`/posts/${id}`);
 }

@@ -31,6 +31,7 @@ let postId = null;
 let postStatus = 'draft'; // Status managed by action buttons instead of dropdown
 let allTags = []; // Store all fetched tags for autocomplete
 let selectedTags = []; // Currently selected tags
+let loadedPostTags = []; // Store original tag objects from loaded post (for edit mode)
 
 async function init() {
   if (!isAuthenticated()) {
@@ -62,7 +63,8 @@ async function init() {
 async function loadAllTags() {
   try {
     const response = await getTags();
-    allTags = response.data || [];
+    // Backend returns { count, tags } format
+    allTags = response.tags || [];
   } catch (error) {
     console.warn("Failed to load tags for autocomplete:", error);
     // Continue without tag suggestions
@@ -183,12 +185,17 @@ async function loadPostForEdit() {
   try {
     showLoader(document.getElementById("main-content"));
     const response = await getMyPostById(postId);
-    const post = response.data;
+    const post = response.post;
 
     // Populate form
     editorTitleInput.value = post.title || "";
     editorCoverInput.value = post.coverImage || "";
-    editorTagsInput.value = post.tags ? post.tags.map(t => t.name).join(", ") : "";
+
+    // Store loaded tags with their IDs for later use
+    loadedPostTags = post.tags || [];
+    selectedTags = post.tags ? post.tags.map(t => t.name) : [];
+    editorTagsInput.value = selectedTags.join(", ");
+
     postStatus = post.status;
     editorContent.value = post.content || "";
 
@@ -227,12 +234,32 @@ async function handleFormSubmit() {
     return;
   }
 
+  // Resolve tag names to tag IDs (backend expects array of ObjectIds)
+  let tagIds = [];
+  if (selectedTags.length > 0) {
+    tagIds = selectedTags
+      .map(tagName => {
+        // Check loaded tags first (edit mode - these already have IDs)
+        const loadedTag = loadedPostTags.find(t =>
+          t.name.toLowerCase() === tagName.toLowerCase()
+        );
+        if (loadedTag) return loadedTag._id;
+
+        // Check all tags (for newly added tags in edit mode or create mode)
+        const availableTag = allTags.find(t =>
+          t.name.toLowerCase() === tagName.toLowerCase()
+        );
+        return availableTag ? availableTag._id : null;
+      })
+      .filter(id => id !== null);
+  }
+
   // Prepare post data
   const postData = {
     title: editorTitleInput.value.trim(),
     content: editorContent.value.trim(),
     coverImage: editorCoverInput.value.trim() || null,
-    tags: selectedTags.map(tag => ({ name: tag })), // Convert to expected format
+    tags: tagIds, // Send tag IDs, not name objects
     status: postStatus
   };
 
@@ -251,7 +278,7 @@ async function handleFormSubmit() {
       showErrorToast("Post created successfully", "success");
       // Redirect to post view
       setTimeout(() => {
-        window.location.href = `/client/pages/post.html?slug=${response.data.slug}`;
+        window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
       }, 1000);
     }
   } catch (error) {
