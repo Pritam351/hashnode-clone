@@ -1,6 +1,8 @@
 /* Dashboard Styles */
 
 .dashboard-section {
+  max-width: 90rem; /* Extend from default 72rem to 90rem (1440px) for better use of screen space */
+  margin: 0 auto;
   padding: 2rem;
 }
 

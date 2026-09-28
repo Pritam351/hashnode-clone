@@ -12,7 +12,6 @@ const editorForm = document.getElementById("editor-form");
 const editorTitleInput = document.getElementById("editor-title-input");
 const editorCoverInput = document.getElementById("editor-cover-input");
 const editorTagsInput = document.getElementById("editor-tags-input");
-const editorStatusSelect = document.getElementById("editor-status");
 const editorContent = document.getElementById("editor-content");
 const editorPreviewToggle = document.getElementById("editor-preview-toggle");
 const editorPreviewContainer = document.getElementById("editor-preview-container");
@@ -29,6 +28,7 @@ const tagInputHelp = document.getElementById("tag-input-help");
 
 let isEditMode = false;
 let postId = null;
+let postStatus = 'draft'; // Status managed by action buttons instead of dropdown
 let allTags = []; // Store all fetched tags for autocomplete
 let selectedTags = []; // Currently selected tags
 
@@ -54,7 +54,7 @@ async function init() {
     isEditMode = false;
     editorTitle.textContent = "Create New Post";
     // Set default status to draft
-    editorStatusSelect.value = "draft";
+    postStatus = "draft";
     initializePreview();
   }
 }
@@ -76,12 +76,12 @@ function setupEventListeners() {
   });
 
   editorSaveDraftBtn.addEventListener("click", () => {
-    editorStatusSelect.value = "draft";
+    postStatus = "draft";
     handleFormSubmit();
   });
 
   editorPublishBtn.addEventListener("click", () => {
-    editorStatusSelect.value = "published";
+    postStatus = "published";
     handleFormSubmit();
   });
 
@@ -189,7 +189,7 @@ async function loadPostForEdit() {
     editorTitleInput.value = post.title || "";
     editorCoverInput.value = post.coverImage || "";
     editorTagsInput.value = post.tags ? post.tags.map(t => t.name).join(", ") : "";
-    editorStatusSelect.value = post.status;
+    postStatus = post.status;
     editorContent.value = post.content || "";
 
     // Update preview if toggle is on
@@ -233,7 +233,7 @@ async function handleFormSubmit() {
     content: editorContent.value.trim(),
     coverImage: editorCoverInput.value.trim() || null,
     tags: selectedTags.map(tag => ({ name: tag })), // Convert to expected format
-    status: editorStatusSelect.value
+    status: postStatus
   };
 
   try {

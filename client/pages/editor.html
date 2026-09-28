@@ -41,6 +41,12 @@
                 </div>
 
                 <div class="editor-form-group">
+                    <label for="editor-content" class="form-label">Content (Markdown)</label>
+                    <textarea id="editor-content" class="form-textarea" placeholder="Write your story in Markdown..." required></textarea>
+                    <div class="form-help">Use Markdown to format your content. Preview updates in real time.</div>
+                </div>
+
+                <div class="editor-form-group">
                     <label for="editor-tags-input" class="form-label">Tags</label>
                     <div class="tags-container">
                         <input type="text" id="editor-tags-input" class="form-input" placeholder="e.g., javascript, webdev, tutorial" autocomplete="off">
@@ -48,21 +54,6 @@
                         <div id="tag-suggestions" class="tag-suggestions hidden"></div>
                     </div>
                     <div id="tag-input-help" class="form-help">Tags help categorize your post and make it discoverable</div>
-                </div>
-
-                <div class="editor-form-group">
-                    <label for="editor-status" class="form-label">Status</label>
-                    <select id="editor-status" class="form-select">
-                        <option value="draft">Save as Draft</option>
-                        <option value="published">Publish</option>
-                    </select>
-                    <div class="form-help">Choose whether to save as draft or publish immediately</div>
-                </div>
-
-                <div class="editor-form-group">
-                    <label for="editor-content" class="form-label">Content (Markdown)</label>
-                    <textarea id="editor-content" class="form-textarea" placeholder="Write your story in Markdown..." required></textarea>
-                    <div class="form-help">Use Markdown to format your content. Preview updates in real time.</div>
                 </div>
 
                 <div class="editor-preview-wrapper">
