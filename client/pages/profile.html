@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View author profile and published articles on DevHaven">
+    <meta name="theme-color" content="#10131a">
+    <title>Profile | DevHaven</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/feed.css">
+    <link rel="stylesheet" href="../css/profile.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div id="navbar-root"></div>
+
+    <main id="main-content" class="app-main" tabindex="-1">
+        <div class="profile-container">
+            <div id="profile-loader" class="loader-container"></div>
+            <div id="profile-error" class="error-container"></div>
+
+            <article id="profile-card" class="profile-card" hidden>
+                <div class="profile-avatar-wrapper">
+                    <div id="profile-avatar" class="profile-avatar">
+                        <!-- Avatar img or initials -->
+                    </div>
+                </div>
+
+                <h1 id="profile-name" class="profile-name"></h1>
+                <p id="profile-bio" class="profile-bio" hidden></p>
+
+                <div class="profile-meta">
+                    <span class="profile-stat-badge">
+                        <strong id="post-count-value">0</strong>
+                        <span id="post-count-label">Published Posts</span>
+                    </span>
+                </div>
+            </article>
+
+            <section id="profile-posts-section" class="profile-posts-section" hidden aria-labelledby="posts-heading">
+                <header class="profile-posts-header">
+                    <h2 id="posts-heading" class="profile-posts-title">Published Articles</h2>
+                    <span id="posts-summary-count" class="profile-posts-count"></span>
+                </header>
+
+                <div id="posts-container" class="profile-posts-grid" role="region" aria-live="polite" aria-label="Author articles">
+                    <!-- Posts will be rendered here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>DevHaven is a place to share what you learn.</p>
+    </footer>
+
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/profile.js"></script>
+</body>
+</html>

@@ -31,9 +31,13 @@ function renderPost(post, container) {
     const meta = document.createElement("div");
     meta.className = "post-detail__meta";
 
-    const author = document.createElement("span");
+    const authorId = post.author?._id || post.author?.id;
+    const author = document.createElement(authorId ? "a" : "span");
     author.className = "post-detail__author";
     author.textContent = post.author?.name || "Anonymous";
+    if (authorId) {
+        author.href = `/client/pages/profile.html?id=${encodeURIComponent(authorId)}`;
+    }
     meta.appendChild(author);
 
     const separator = document.createElement("span");
