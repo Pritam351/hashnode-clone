@@ -409,6 +409,85 @@ pre code {
     }
 }
 
+/* Settings Styles */
+.settings-section {
+    max-width: 56rem;
+    margin: 0 auto;
+}
+
+.settings-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.settings-header h1 {
+    margin-bottom: var(--space-2);
+}
+
+.settings-description {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+
+}
+
+.settings-panel {
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+.settings-panel h2 {
+    margin-bottom: var(--space-5);
+    font-size: 1.5rem;
+    color: var(--color-text);
+}
+
+.settings-form {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.settings-form textarea {
+    min-height: 7rem;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+}
+
+.message-container {
+    margin-top: var(--space-5);
+}
+
+.success-message {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid rgb(126 215 170 / 45%);
+    border-radius: var(--radius-md);
+    background: rgb(126 215 170 / 10%);
+    color: var(--color-success);
+}
+
+.success-message__title {
+    font-weight: 800;
+}
+
+.success-message__text {
+    margin: 0;
+    color: #a8f0cc;
+}
+
+.loader-container,
+.error-container {
+    margin-bottom: var(--space-4);
+}
+
 @media (max-width: 42rem) {
     .app-main {
         min-height: calc(100vh - 8rem);
@@ -422,5 +501,17 @@ pre code {
 
     .foundation-panel::after {
         display: none;
+    }
+
+    .settings-panel {
+        padding: var(--space-4);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .button {
+        width: 100%;
     }
 }

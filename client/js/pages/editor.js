@@ -78,16 +78,19 @@ function setupEventListeners() {
   });
 
   editorSaveDraftBtn.addEventListener("click", () => {
+    console.log('[EDITOR] Save as Draft button clicked');
     postStatus = "draft";
     handleFormSubmit();
   });
 
   editorPublishBtn.addEventListener("click", () => {
+    console.log('[EDITOR] Publish button clicked');
     postStatus = "published";
     handleFormSubmit();
   });
 
   editorCancelBtn.addEventListener("click", () => {
+    console.log('[EDITOR] Cancel button clicked');
     if (isEditMode) {
       window.location.href = "/client/pages/dashboard.html";
     } else {
@@ -263,9 +266,15 @@ async function handleFormSubmit() {
     status: postStatus
   };
 
+  console.log('[EDITOR] Submitting post data:', postData);
+  console.log('[EDITOR] Status:', postStatus);
+  console.log('[EDITOR] Is edit mode:', isEditMode);
+  if (isEditMode) console.log('[EDITOR] Post ID:', postId);
+
   try {
     if (isEditMode) {
       showLoader(document.getElementById("main-content"));
+      console.log('[EDITOR] Calling updatePost for ID:', postId);
       await updatePost(postId, postData);
       showErrorToast("Post updated successfully", "success");
       // Redirect to dashboard after successful update
@@ -274,7 +283,9 @@ async function handleFormSubmit() {
       }, 1000);
     } else {
       showLoader(document.getElementById("main-content"));
+      console.log('[EDITOR] Calling createPost');
       const response = await createPost(postData);
+      console.log('[EDITOR] Create post response:', response);
       showErrorToast("Post created successfully", "success");
       // Redirect to post view
       setTimeout(() => {
@@ -283,6 +294,7 @@ async function handleFormSubmit() {
     }
   } catch (error) {
     hideLoader(document.getElementById("main-content"));
+    console.error('[EDITOR] Error:', error);
     let errorMessage = "Failed to save post";
     if (error.response && error.response.data && error.response.data.message) {
       errorMessage = error.response.data.message;

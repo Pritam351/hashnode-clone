@@ -107,6 +107,9 @@ async function loadDashboardData() {
     const statsResponse = await getMyPosts({ status: undefined, page: 1, limit: 1000 }); // Fetch all to get counts
     const postsResponse = await getMyPosts({ status: currentStatus, page: currentPage, limit });
 
+    console.log('[DASHBOARD] Stats response:', statsResponse);
+    console.log('[DASHBOARD] Posts response:', postsResponse);
+
     // Backend returns { posts, pagination } format
     const allPostsData = statsResponse.posts || [];
 
@@ -130,6 +133,7 @@ async function loadDashboardData() {
     hideLoader(loaderContainer);
   } catch (error) {
     hideLoader(loaderContainer);
+    console.error('[DASHBOARD] Error:', error);
     showError(error);
   }
 }
