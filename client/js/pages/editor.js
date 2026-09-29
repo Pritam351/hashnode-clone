@@ -1,13 +1,12 @@
-import { isAuthenticated, logout } from "../utils/auth.js";
+import { isAuthenticated } from "../utils/auth.js";
 import { renderNavbar } from "../components/navbar.js";
-import { showLoader, hideLoader, createLoaderElement } from "../components/loader.js";
-import { createErrorMessage, showErrorToast } from "../components/errorMessage.js";
+import { createErrorMessage } from "../components/errorMessage.js";
 import { getMyPostById, createPost, updatePost } from "../api/postApi.js";
-import { renderMarkdown } from "../utils/markdown.js";
+import { renderMarkdown, initCodeBlockActions } from "../utils/markdown.js";
 import { getTags } from "../api/tagApi.js";
-import { getUser } from "../utils/auth.js";
 
 const navbarRoot = document.getElementById("navbar-root");
+const editorMessage = document.getElementById("editor-message");
 const editorForm = document.getElementById("editor-form");
 const editorTitleInput = document.getElementById("editor-title-input");
 const editorCoverInput = document.getElementById("editor-cover-input");
@@ -18,7 +17,6 @@ const editorPreviewContainer = document.getElementById("editor-preview-container
 const editorPreview = document.getElementById("editor-preview");
 const editorSaveDraftBtn = document.getElementById("editor-save-draft");
 const editorPublishBtn = document.getElementById("editor-publish");
-const editorCancelBtn = document.getElementById("editor-cancel");
 const editorTitle = document.getElementById("editor-title");
 const titleHelp = document.getElementById("title-help");
 const coverPreviewContainer = document.getElementById("cover-preview-container");
@@ -28,10 +26,35 @@ const tagInputHelp = document.getElementById("tag-input-help");
 
 let isEditMode = false;
 let postId = null;
-let postStatus = 'draft'; // Status managed by action buttons instead of dropdown
-let allTags = []; // Store all fetched tags for autocomplete
-let selectedTags = []; // Currently selected tags
-let loadedPostTags = []; // Store original tag objects from loaded post (for edit mode)
+let postStatus = "draft";
+let allTags = [];
+let selectedTags = [];
+let loadedPostTags = [];
+let isSubmitting = false;
+
+function showMessage(message, type = "error", title = "") {
+  if (!editorMessage) return;
+  editorMessage.innerHTML = "";
+
+  if (type === "error") {
+    const errorEl = createErrorMessage(message, title || "Error");
+    editorMessage.appendChild(errorEl);
+  } else {
+    const successEl = document.createElement("div");
+    successEl.className = "editor-alert editor-alert--success";
+    successEl.setAttribute("role", "status");
+    successEl.textContent = message;
+    editorMessage.appendChild(successEl);
+  }
+
+  editorMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function clearMessage() {
+  if (editorMessage) {
+    editorMessage.innerHTML = "";
+  }
+}
 
 async function init() {
   if (!isAuthenticated()) {
@@ -40,21 +63,23 @@ async function init() {
   }
 
   renderNavbar(navbarRoot);
-  await loadAllTags(); // Load tags for autocomplete
+  await loadAllTags();
   setupEventListeners();
 
-  // Check if we're in edit mode
   const urlParams = new URLSearchParams(window.location.search);
   postId = urlParams.get("id");
 
   if (postId) {
     isEditMode = true;
-    editorTitle.textContent = "Edit Post";
+    if (editorTitle) editorTitle.textContent = "Edit Post";
+    if (editorPublishBtn) editorPublishBtn.textContent = "Update & Publish";
+    if (editorSaveDraftBtn) editorSaveDraftBtn.textContent = "Update Draft";
     await loadPostForEdit();
   } else {
     isEditMode = false;
-    editorTitle.textContent = "Create New Post";
-    // Set default status to draft
+    if (editorTitle) editorTitle.textContent = "New Post";
+    if (editorPublishBtn) editorPublishBtn.textContent = "Publish";
+    if (editorSaveDraftBtn) editorSaveDraftBtn.textContent = "Save as Draft";
     postStatus = "draft";
     initializePreview();
   }
@@ -63,11 +88,9 @@ async function init() {
 async function loadAllTags() {
   try {
     const response = await getTags();
-    // Backend returns { count, tags } format
     allTags = response.tags || [];
   } catch (error) {
     console.warn("Failed to load tags for autocomplete:", error);
-    // Continue without tag suggestions
   }
 }
 
@@ -78,31 +101,13 @@ function setupEventListeners() {
   });
 
   editorSaveDraftBtn.addEventListener("click", () => {
-    console.log('[EDITOR] Save as Draft button clicked');
     postStatus = "draft";
     handleFormSubmit();
   });
 
   editorPublishBtn.addEventListener("click", () => {
-    console.log('[EDITOR] Publish button clicked');
     postStatus = "published";
     handleFormSubmit();
-  });
-
-  editorCancelBtn.addEventListener("click", () => {
-    console.log('[EDITOR] Cancel button clicked');
-    if (isEditMode) {
-      window.location.href = "/client/pages/dashboard.html";
-    } else {
-      // Ask for confirmation if there's content
-      if (editorTitleInput.value.trim() || editorContent.value.trim()) {
-        if (confirm("Are you sure you want to cancel? Any unsaved changes will be lost.")) {
-          window.location.href = "/client/pages/dashboard.html";
-        }
-      } else {
-        window.location.href = "/client/pages/dashboard.html";
-      }
-    }
   });
 
   editorPreviewToggle.addEventListener("change", () => {
@@ -117,19 +122,11 @@ function setupEventListeners() {
     if (editorPreviewToggle.checked) {
       updatePreview();
     }
+  });
 
-    // Update title help visibility
-    if (editorTitleInput.value.trim()) {
-      titleHelp.style.opacity = "0.5";
-    } else {
-      titleHelp.style.opacity = "1";
-    }
-
-    // Update tag input help visibility
-    if (editorTagsInput.value.trim()) {
-      tagInputHelp.style.opacity = "0.5";
-    } else {
-      tagInputHelp.style.opacity = "1";
+  editorTitleInput.addEventListener("input", () => {
+    if (titleHelp) {
+      titleHelp.style.opacity = editorTitleInput.value.trim() ? "0.5" : "1";
     }
   });
 
@@ -144,24 +141,30 @@ function setupEventListeners() {
   });
 
   // Cover image preview
-  editorCoverInput.addEventListener("change", () => {
-    const url = editorCoverInput.value.trim();
-    if (url) {
-      coverPreview.src = url;
-      coverPreviewContainer.classList.remove("hidden");
-      coverPreview.onerror = () => {
-        coverPreview.src = ""; // Break the image link on error
-        coverPreviewContainer.classList.add("hidden");
-        showErrorToast("Invalid image URL", "error");
-      };
-    } else {
+  editorCoverInput.addEventListener("input", handleCoverImageChange);
+  editorCoverInput.addEventListener("change", handleCoverImageChange);
+}
+
+function handleCoverImageChange() {
+  const url = editorCoverInput.value.trim();
+  if (url) {
+    coverPreview.src = url;
+    coverPreviewContainer.classList.remove("hidden");
+    coverPreview.onerror = () => {
+      coverPreview.src = "";
       coverPreviewContainer.classList.add("hidden");
-    }
-  });
+      showMessage("Invalid cover image URL", "error", "Image Error");
+    };
+    coverPreview.onload = () => {
+      clearMessage();
+    };
+  } else {
+    coverPreviewContainer.classList.add("hidden");
+    coverPreview.src = "";
+  }
 }
 
 function initializePreview() {
-  // Start with preview hidden
   editorPreviewContainer.classList.add("hidden");
   editorPreviewToggle.checked = false;
 }
@@ -177,8 +180,9 @@ function hidePreview() {
 
 function updatePreview() {
   const content = editorContent.value;
-  if (content.trim()) {
+  if (content && content.trim()) {
     editorPreview.innerHTML = renderMarkdown(content);
+    initCodeBlockActions(editorPreview);
   } else {
     editorPreview.innerHTML = "<p>Start writing to see a preview...</p>";
   }
@@ -186,155 +190,210 @@ function updatePreview() {
 
 async function loadPostForEdit() {
   try {
-    showLoader(document.getElementById("main-content"));
+    setFormDisabled(true);
     const response = await getMyPostById(postId);
     const post = response.post;
 
-    // Populate form
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
     editorTitleInput.value = post.title || "";
     editorCoverInput.value = post.coverImage || "";
 
-    // Store loaded tags with their IDs for later use
     loadedPostTags = post.tags || [];
-    selectedTags = post.tags ? post.tags.map(t => t.name) : [];
+    selectedTags = loadedPostTags.map((t) => (typeof t === "object" ? t.name : t));
     editorTagsInput.value = selectedTags.join(", ");
 
-    postStatus = post.status;
+    postStatus = post.status || "draft";
     editorContent.value = post.content || "";
 
-    // Update preview if toggle is on
     if (editorPreviewToggle.checked) {
       updatePreview();
     }
 
-    // Show cover image preview if exists
     if (post.coverImage) {
       coverPreview.src = post.coverImage;
       coverPreviewContainer.classList.remove("hidden");
     }
 
-    hideLoader(document.getElementById("main-content"));
+    setFormDisabled(false);
   } catch (error) {
-    hideLoader(document.getElementById("main-content"));
-    showErrorToast("Failed to load post. It may have been deleted or you don't have permission.", "error");
+    setFormDisabled(false);
+    showMessage(
+      "Failed to load post. It may have been deleted or you don't have permission.",
+      "error",
+      "Post Loading Error"
+    );
     setTimeout(() => {
       window.location.href = "/client/pages/dashboard.html";
-    }, 1500);
+    }, 2000);
+  }
+}
+
+function setFormDisabled(disabled) {
+  editorTitleInput.disabled = disabled;
+  editorCoverInput.disabled = disabled;
+  editorTagsInput.disabled = disabled;
+  editorContent.disabled = disabled;
+  editorSaveDraftBtn.disabled = disabled;
+  editorPublishBtn.disabled = disabled;
+}
+
+function setSubmittingState(submitting, status) {
+  isSubmitting = submitting;
+  editorSaveDraftBtn.disabled = submitting;
+  editorPublishBtn.disabled = submitting;
+
+  if (submitting) {
+    if (status === "published") {
+      editorPublishBtn.dataset.originalText = editorPublishBtn.textContent;
+      editorPublishBtn.textContent = isEditMode ? "Updating..." : "Publishing...";
+    } else {
+      editorSaveDraftBtn.dataset.originalText = editorSaveDraftBtn.textContent;
+      editorSaveDraftBtn.textContent = isEditMode ? "Updating Draft..." : "Saving Draft...";
+    }
+  } else {
+    editorPublishBtn.textContent =
+      editorPublishBtn.dataset.originalText || (isEditMode ? "Update & Publish" : "Publish");
+    editorSaveDraftBtn.textContent =
+      editorSaveDraftBtn.dataset.originalText || (isEditMode ? "Update Draft" : "Save as Draft");
   }
 }
 
 async function handleFormSubmit() {
-  // Validate required fields
-  if (!editorTitleInput.value.trim()) {
-    showErrorToast("Title is required", "error");
+  if (isSubmitting) return;
+
+  clearMessage();
+
+  const title = editorTitleInput.value.trim();
+  if (!title) {
+    showMessage("Title is required and cannot be empty or whitespace.", "error", "Validation Error");
     editorTitleInput.focus();
     return;
   }
 
-  if (!editorContent.value.trim()) {
-    showErrorToast("Content is required", "error");
+  const rawContent = editorContent.value;
+  if (!rawContent || !rawContent.trim()) {
+    showMessage("Content is required and cannot be empty or whitespace.", "error", "Validation Error");
     editorContent.focus();
     return;
   }
 
-  // Resolve tag names to tag IDs (backend expects array of ObjectIds)
-  let tagIds = [];
-  if (selectedTags.length > 0) {
-    tagIds = selectedTags
-      .map(tagName => {
-        // Check loaded tags first (edit mode - these already have IDs)
-        const loadedTag = loadedPostTags.find(t =>
-          t.name.toLowerCase() === tagName.toLowerCase()
-        );
-        if (loadedTag) return loadedTag._id;
+  // Parse current tags from input
+  const currentTagsFromInput = editorTagsInput.value
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
 
-        // Check all tags (for newly added tags in edit mode or create mode)
-        const availableTag = allTags.find(t =>
-          t.name.toLowerCase() === tagName.toLowerCase()
+  const combinedTagNames = Array.from(new Set([...selectedTags, ...currentTagsFromInput]));
+
+  let tagIds = [];
+  if (combinedTagNames.length > 0) {
+    tagIds = combinedTagNames
+      .map((tagName) => {
+        const loadedTag = loadedPostTags.find(
+          (t) =>
+            (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
+            (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
         );
-        return availableTag ? availableTag._id : null;
+        if (loadedTag && loadedTag._id) return loadedTag._id;
+
+        const availableTag = allTags.find(
+          (t) =>
+            (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
+            (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
+        );
+        return availableTag && availableTag._id ? availableTag._id : null;
       })
-      .filter(id => id !== null);
+      .filter((id) => id !== null);
   }
 
-  // Prepare post data
   const postData = {
-    title: editorTitleInput.value.trim(),
-    content: editorContent.value.trim(),
-    coverImage: editorCoverInput.value.trim() || null,
-    tags: tagIds, // Send tag IDs, not name objects
+    title,
+    content: rawContent, // Preserve raw Markdown formatting and newlines
+    coverImage: editorCoverInput.value.trim() || "",
+    tags: tagIds,
     status: postStatus
   };
 
-  console.log('[EDITOR] Submitting post data:', postData);
-  console.log('[EDITOR] Status:', postStatus);
-  console.log('[EDITOR] Is edit mode:', isEditMode);
-  if (isEditMode) console.log('[EDITOR] Post ID:', postId);
+  setSubmittingState(true, postStatus);
 
   try {
     if (isEditMode) {
-      showLoader(document.getElementById("main-content"));
-      console.log('[EDITOR] Calling updatePost for ID:', postId);
-      await updatePost(postId, postData);
-      showErrorToast("Post updated successfully", "success");
-      // Redirect to dashboard after successful update
+      const response = await updatePost(postId, postData);
+      showMessage(
+        postStatus === "published"
+          ? "Post updated and published successfully!"
+          : "Draft updated successfully!",
+        "success"
+      );
+
       setTimeout(() => {
-        window.location.href = "/client/pages/dashboard.html";
+        if (postStatus === "published" && response?.post?.slug) {
+          window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
+        } else {
+          window.location.href = "/client/pages/dashboard.html";
+        }
       }, 1000);
     } else {
-      showLoader(document.getElementById("main-content"));
-      console.log('[EDITOR] Calling createPost');
       const response = await createPost(postData);
-      console.log('[EDITOR] Create post response:', response);
-      showErrorToast("Post created successfully", "success");
-      // Redirect to post view
+      showMessage(
+        postStatus === "published"
+          ? "Post published successfully!"
+          : "Draft saved successfully!",
+        "success"
+      );
+
       setTimeout(() => {
-        window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
+        if (postStatus === "published" && response?.post?.slug) {
+          window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
+        } else {
+          window.location.href = "/client/pages/dashboard.html";
+        }
       }, 1000);
     }
   } catch (error) {
-    hideLoader(document.getElementById("main-content"));
-    console.error('[EDITOR] Error:', error);
+    setSubmittingState(false, postStatus);
+    console.error("[EDITOR] Error saving post:", error);
     let errorMessage = "Failed to save post";
     if (error.response && error.response.data && error.response.data.message) {
       errorMessage = error.response.data.message;
     } else if (error.message) {
       errorMessage = error.message;
     }
-    showErrorToast(errorMessage, "error");
-  } finally {
-    if (isEditMode) {
-      hideLoader(document.getElementById("main-content"));
-    }
+    showMessage(errorMessage, "error", "Submission Failed");
   }
 }
 
 // Tag autocomplete functionality
 function handleTagInput(e) {
-  const inputValue = e.target.value.trim();
+  const inputValue = e.target.value;
+  const parts = inputValue.split(",");
+  const currentTag = parts[parts.length - 1].trim();
 
-  if (!inputValue) {
-    hideTagSuggestions();
-    return;
+  selectedTags = parts
+    .slice(0, parts.length - 1)
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  if (tagInputHelp) {
+    tagInputHelp.style.opacity = inputValue.trim() ? "0.5" : "1";
   }
-
-  // Get the last tag being typed (after last comma)
-  const tags = inputValue.split(",");
-  const currentTag = tags[tags.length - 1].trim();
 
   if (!currentTag) {
     hideTagSuggestions();
     return;
   }
 
-  // Filter tags that match the current input
   const matchingTags = allTags
-    .map(tag => tag.name)
-    .filter(tag =>
-      tag.toLowerCase().includes(currentTag.toLowerCase()) &&
-      !selectedTags.includes(tag)
+    .map((tag) => tag.name)
+    .filter(
+      (tagName) =>
+        tagName.toLowerCase().includes(currentTag.toLowerCase()) &&
+        !selectedTags.some((st) => st.toLowerCase() === tagName.toLowerCase())
     )
-    .slice(0, 10); // Limit to 10 suggestions
+    .slice(0, 10);
 
   if (matchingTags.length > 0) {
     showTagSuggestions(matchingTags, currentTag);
@@ -344,16 +403,12 @@ function handleTagInput(e) {
 }
 
 function handleTagKeydown(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    addTagFromInput();
-  } else if (e.key === ",") {
+  if (e.key === "Enter" || e.key === ",") {
     e.preventDefault();
     addTagFromInput();
   } else if (e.key === "Backspace") {
-    const inputValue = editorTagsInput.value.trim();
+    const inputValue = editorTagsInput.value;
     if (!inputValue && selectedTags.length > 0) {
-      // Remove last tag if backspace on empty input
       removeTag(selectedTags.length - 1);
     }
   }
@@ -363,13 +418,14 @@ function addTagFromInput() {
   const inputValue = editorTagsInput.value.trim();
   if (!inputValue) return;
 
-  // Split by comma and process each tag
-  const tags = inputValue.split(",").map(tag => tag.trim()).filter(tag => tag);
+  const tags = inputValue
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
 
-  tags.forEach(tag => {
-    // Check if tag already exists (case-insensitive)
-    const exists = selectedTags.some(selectedTag =>
-      selectedTag.toLowerCase() === tag.toLowerCase()
+  tags.forEach((tag) => {
+    const exists = selectedTags.some(
+      (selectedTag) => selectedTag.toLowerCase() === tag.toLowerCase()
     );
 
     if (!exists && tag) {
@@ -377,9 +433,7 @@ function addTagFromInput() {
     }
   });
 
-  // Update UI
   updateTagDisplay();
-  editorTagsInput.value = "";
   hideTagSuggestions();
 }
 
@@ -389,20 +443,11 @@ function removeTag(index) {
 }
 
 function showTagSuggestions(matchingTags, currentTag) {
-  // Position the suggestions box below the input
-  const rect = editorTagsInput.getBoundingClientRect();
-  tagSuggestions.style.top = `${rect.bottom + window.scrollY}px`;
-  tagSuggestions.style.left = `${rect.left + window.scrollX}px`;
-  tagSuggestions.style.width = `${rect.width}px`;
-
-  // Clear and populate suggestions
   tagSuggestions.innerHTML = "";
-  matchingTags.forEach(tag => {
+  matchingTags.forEach((tag) => {
     const suggestionDiv = document.createElement("div");
     suggestionDiv.className = "tag-suggestion";
-    suggestionDiv.textContent = tag;
 
-    // Highlight the matching part
     const lowerTag = tag.toLowerCase();
     const lowerCurrent = currentTag.toLowerCase();
     const startIndex = lowerTag.indexOf(lowerCurrent);
@@ -413,19 +458,19 @@ function showTagSuggestions(matchingTags, currentTag) {
       const afterMatch = tag.substring(startIndex + currentTag.length);
 
       suggestionDiv.innerHTML = `${beforeMatch}<strong>${matchText}</strong>${afterMatch}`;
+    } else {
+      suggestionDiv.textContent = tag;
     }
 
     suggestionDiv.addEventListener("click", () => {
-      // Add the tag to selected tags
-      const inputValue = editorTagsInput.value.trim();
-      const tags = inputValue.split(",");
-      tags[tags.length - 1] = tag; // Replace current tag with selected suggestion
-
-      // Reconstruct the input value
-      editorTagsInput.value = tags.filter(t => t.trim()).join(", ") + ", ";
-
-      // Add the tag
-      addTagFromInput();
+      const inputValue = editorTagsInput.value;
+      const parts = inputValue.split(",");
+      parts[parts.length - 1] = tag;
+      const cleaned = parts.map((t) => t.trim()).filter(Boolean);
+      selectedTags = Array.from(new Set(cleaned));
+      editorTagsInput.value = selectedTags.join(", ") + ", ";
+      editorTagsInput.focus();
+      hideTagSuggestions();
     });
 
     tagSuggestions.appendChild(suggestionDiv);
@@ -439,17 +484,10 @@ function hideTagSuggestions() {
 }
 
 function updateTagDisplay() {
-  // Update the visual tag display (we'll implement this as chips)
-  // For now, just update the input with selected tags
   editorTagsInput.value = selectedTags.join(", ");
-
-  // Update help text visibility
-  if (selectedTags.length > 0) {
-    tagInputHelp.style.opacity = "0.5";
-  } else {
-    tagInputHelp.style.opacity = "1";
+  if (tagInputHelp) {
+    tagInputHelp.style.opacity = selectedTags.length > 0 ? "0.5" : "1";
   }
 }
 
-// Initialize editor on load
 init();
