@@ -36,7 +36,7 @@ function renderPost(post, container) {
     author.className = "post-detail__author";
     author.textContent = post.author?.name || "Anonymous";
     if (authorId) {
-        author.href = `/client/pages/profile.html?id=${encodeURIComponent(authorId)}`;
+        author.href = `/pages/profile.html?id=${encodeURIComponent(authorId)}`;
     }
     meta.appendChild(author);
 

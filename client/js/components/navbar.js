@@ -4,20 +4,20 @@ function getNavigationItems(authenticated) {
     if (authenticated) {
         return [
             { label: "Home", href: "/client/index.html", key: "home" },
-            { label: "Tags", href: "/client/pages/tags.html", key: "tags" },
-            { label: "Dashboard", href: "/client/pages/dashboard.html", key: "dashboard" },
-            { label: "Create Post", href: "/client/pages/editor.html", key: "editor" },
-            { label: "Profile", href: "/client/pages/profile.html", key: "profile" },
-            { label: "Settings", href: "/client/pages/settings.html", key: "settings" },
+            { label: "Tags", href: "/pages/tags.html", key: "tags" },
+            { label: "Dashboard", href: "/pages/dashboard.html", key: "dashboard" },
+            { label: "Create Post", href: "/pages/editor.html", key: "editor" },
+            { label: "Profile", href: "/pages/profile.html", key: "profile" },
+            { label: "Settings", href: "/pages/settings.html", key: "settings" },
             { label: "Logout", href: "#", key: "logout", action: "logout" }
         ];
     }
 
     return [
         { label: "Home", href: "/client/index.html", key: "home" },
-        { label: "Tags", href: "/client/pages/tags.html", key: "tags" },
-        { label: "Login", href: "/client/pages/login.html", key: "login" },
-        { label: "Register", href: "/client/pages/register.html", key: "register" }
+        { label: "Tags", href: "/pages/tags.html", key: "tags" },
+        { label: "Login", href: "/pages/login.html", key: "login" },
+        { label: "Register", href: "/pages/register.html", key: "register" }
     ];
 }
 

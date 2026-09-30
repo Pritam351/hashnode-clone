@@ -14,7 +14,7 @@ export async function requireAuth() {
     const token = getToken();
 
     if (!token) {
-        window.location.href = "/client/pages/login.html";
+        window.location.href = "/pages/login.html";
         return null;
     }
 
@@ -24,7 +24,7 @@ export async function requireAuth() {
     } catch (error) {
         console.error("Token validation failed:", error);
         clearAuth();
-        window.location.href = "/client/pages/login.html";
+        window.location.href = "/pages/login.html";
         return null;
     }
 }

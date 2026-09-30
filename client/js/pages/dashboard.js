@@ -35,7 +35,7 @@ let totalStats = { all: 0, published: 0, draft: 0 };
 
 async function init() {
   if (!isAuthenticated()) {
-    window.location.href = "/client/pages/login.html";
+    window.location.href = "/pages/login.html";
     return;
   }
 
@@ -159,7 +159,7 @@ function createPostCard(post) {
   statusBadge.textContent = post.status.charAt(0).toUpperCase() + post.status.slice(1);
 
   const titleLink = document.createElement("a");
-  titleLink.href = `/client/pages/post.html?slug=${post.slug}`;
+  titleLink.href = `/pages/post.html?slug=${post.slug}`;
   titleLink.className = "post-card__title";
   titleLink.textContent = post.title;
   titleLink.target = "_blank"; // Open in new tab for preview
@@ -200,14 +200,14 @@ function createPostCard(post) {
   actionsContainer.className = "post-card__actions";
 
   const viewBtn = document.createElement("a");
-  viewBtn.href = `/client/pages/post.html?slug=${post.slug}`;
+  viewBtn.href = `/pages/post.html?slug=${post.slug}`;
   viewBtn.className = "btn btn-outline btn-sm";
   viewBtn.textContent = "View";
   viewBtn.target = "_blank";
   viewBtn.rel = "noopener noreferrer";
 
   const editBtn = document.createElement("a");
-  editBtn.href = `/client/pages/editor.html?id=${post._id}`;
+  editBtn.href = `/pages/editor.html?id=${post._id}`;
   editBtn.className = "btn btn-outline btn-sm";
   editBtn.textContent = "Edit";
 
@@ -229,7 +229,7 @@ function renderEmptyState() {
     <div class="empty-state">
       <h3>No posts yet</h3>
       <p>Start writing your first story to share with the world.</p>
-      <a href="/client/pages/editor.html" class="btn btn-primary">Create a Post</a>
+      <a href="/pages/editor.html" class="btn btn-primary">Create a Post</a>
     </div>
   `;
 }

@@ -104,7 +104,7 @@ async function handleSubmit(event) {
         showSuccess("Registration successful! Redirecting to login...");
 
         setTimeout(() => {
-            window.location.href = "/client/pages/login.html";
+            window.location.href = "/pages/login.html";
         }, 1500);
 
     } catch (error) {

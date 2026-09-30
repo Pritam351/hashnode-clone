@@ -6,7 +6,7 @@ export function createPostCard(post) {
 
     const link = document.createElement("a");
     link.className = "post-card__link";
-    link.href = `/client/pages/post.html?slug=${post.slug}`;
+    link.href = `/pages/post.html?slug=${post.slug}`;
     link.setAttribute("aria-label", `Read ${post.title}`);
 
     if (post.coverImage) {

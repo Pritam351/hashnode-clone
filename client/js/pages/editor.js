@@ -58,7 +58,7 @@ function clearMessage() {
 
 async function init() {
   if (!isAuthenticated()) {
-    window.location.href = "/client/pages/login.html";
+    window.location.href = "/pages/login.html";
     return;
   }
 
@@ -226,7 +226,7 @@ async function loadPostForEdit() {
       "Post Loading Error"
     );
     setTimeout(() => {
-      window.location.href = "/client/pages/dashboard.html";
+      window.location.href = "/pages/dashboard.html";
     }, 2000);
   }
 }
@@ -345,9 +345,9 @@ if (combinedTagNames.length > 0) {
 
       setTimeout(() => {
         if (postStatus === "published" && response?.post?.slug) {
-          window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
+          window.location.href = `/pages/post.html?slug=${response.post.slug}`;
         } else {
-          window.location.href = "/client/pages/dashboard.html";
+          window.location.href = "/pages/dashboard.html";
         }
       }, 1000);
     } else {
@@ -361,9 +361,9 @@ if (combinedTagNames.length > 0) {
 
       setTimeout(() => {
         if (postStatus === "published" && response?.post?.slug) {
-          window.location.href = `/client/pages/post.html?slug=${response.post.slug}`;
+          window.location.href = `/pages/post.html?slug=${response.post.slug}`;
         } else {
-          window.location.href = "/client/pages/dashboard.html";
+          window.location.href = "/pages/dashboard.html";
         }
       }, 1000);
     }
