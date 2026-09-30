@@ -11,7 +11,6 @@ function initializeApplication() {
 
         const currentPath = window.location.pathname;
         const isHomePage = currentPath === "/" ||
-                          currentPath === "/client/index.html" ||
                           currentPath.endsWith("/index.html");
 
         if (isHomePage && document.getElementById("posts-container")) {

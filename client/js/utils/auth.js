@@ -7,7 +7,7 @@ export function isAuthenticated() {
 
 export function logout() {
     clearAuth();
-    window.location.href = "/client/index.html";
+    window.location.href = "/";
 }
 
 export async function requireAuth() {
@@ -29,7 +29,7 @@ export async function requireAuth() {
     }
 }
 
-export function redirectIfAuthenticated(redirectTo = "/client/index.html") {
+export function redirectIfAuthenticated(redirectTo = "/index.html") {
     if (isAuthenticated()) {
         window.location.href = redirectTo;
     }

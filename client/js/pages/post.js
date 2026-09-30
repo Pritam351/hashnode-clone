@@ -61,7 +61,7 @@ function renderPost(post, container) {
         post.tags.forEach(tag => {
             const tagPill = document.createElement("a");
             tagPill.className = "tag-pill";
-            tagPill.href = `/client/index.html?tag=${tag.slug}`;
+            tagPill.href = `/?tag=${tag.slug}`;
             tagPill.textContent = tag.name;
             tagsContainer.appendChild(tagPill);
         });

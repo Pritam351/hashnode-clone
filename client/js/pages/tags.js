@@ -5,7 +5,7 @@ import { renderErrorMessage } from "../components/errorMessage.js";
 function createTagCard(tag) {
     const link = document.createElement("a");
     link.className = "tag-card";
-    link.href = `/client/index.html?tag=${tag.slug}`;
+    link.href = `/?tag=${tag.slug}`;
     link.setAttribute("aria-label", `View posts tagged with ${tag.name}`);
 
     const name = document.createElement("h2");

@@ -55,7 +55,7 @@ export function createPostCard(post) {
         post.tags.forEach(tag => {
             const tagPill = document.createElement("a");
             tagPill.className = "tag-pill tag-pill--small";
-            tagPill.href = `/client/index.html?tag=${tag.slug}`;
+            tagPill.href = `/?tag=${tag.slug}`;
             tagPill.textContent = tag.name;
             tagPill.addEventListener("click", (event) => {
                 event.stopPropagation();

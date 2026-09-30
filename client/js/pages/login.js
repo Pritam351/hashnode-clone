@@ -81,7 +81,7 @@ async function handleSubmit(event) {
         setToken(response.token);
         setCurrentUser(response.user);
 
-        window.location.href = "/client/index.html";
+        window.location.href = "/";
 
     } catch (error) {
         console.error("Login error:", error);

@@ -3,7 +3,7 @@ import { isAuthenticated, logout } from "../utils/auth.js";
 function getNavigationItems(authenticated) {
     if (authenticated) {
         return [
-            { label: "Home", href: "/client/index.html", key: "home" },
+            { label: "Home", href: "/", key: "home" },
             { label: "Tags", href: "/pages/tags.html", key: "tags" },
             { label: "Dashboard", href: "/pages/dashboard.html", key: "dashboard" },
             { label: "Create Post", href: "/pages/editor.html", key: "editor" },
@@ -14,7 +14,7 @@ function getNavigationItems(authenticated) {
     }
 
     return [
-        { label: "Home", href: "/client/index.html", key: "home" },
+        { label: "Home", href: "/", key: "home" },
         { label: "Tags", href: "/pages/tags.html", key: "tags" },
         { label: "Login", href: "/pages/login.html", key: "login" },
         { label: "Register", href: "/pages/register.html", key: "register" }
@@ -73,7 +73,7 @@ export function renderNavbar(mountElement) {
     header.className = "site-nav";
     inner.className = "site-nav__inner";
     brand.className = "site-nav__brand";
-    brand.href = "/client/index.html";
+    brand.href = "/";
     brand.setAttribute("aria-label", "DevHaven home");
     brandMark.className = "site-nav__brand-mark";
     brandMark.setAttribute("aria-hidden", "true");
