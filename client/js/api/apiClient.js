@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://localhost:5000/api";
+export const API_BASE_URL = "https://hashnode-clone-api.onrender.com/api";
 
 function buildUrl(path, query) {
     const url = new URL(path.replace(/^\//, ""), `${API_BASE_URL}/`);
