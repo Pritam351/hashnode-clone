@@ -147,6 +147,10 @@
 }
 
 /* Cover Image Preview */
+.hidden {
+  display: none !important;
+}
+
 .cover-preview-container {
   margin-top: 0.75rem;
   border-radius: var(--radius-sm);
@@ -414,7 +418,13 @@
   font-size: 0.95rem;
   font-weight: 600;
   min-width: 140px;
-  transition: all 0.2s ease;
+   border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
 }
 
 .editor-form-actions .btn-outline {
@@ -425,8 +435,10 @@
   box-shadow: 0 2px 8px rgba(138, 180, 255, 0.3);
 }
 
-.editor-form-actions .btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(138, 180, 255, 0.4);
+.editor-form-actions .btn:hover {
+   background: #a8c6ff;
+  border-color: transparent;
+  color: var(--color-accent-contrast);
   transform: translateY(-1px);
 }
 

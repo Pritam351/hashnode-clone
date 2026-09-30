@@ -12,7 +12,7 @@ export function createPostCard(post) {
     if (post.coverImage) {
         const coverImage = document.createElement("div");
         coverImage.className = "post-card__image";
-        coverImage.style.backgroundImage = `url(${post.coverImage})`;
+        coverImage.style.backgroundImage = `url(${JSON.stringify(post.coverImage)})`;
         coverImage.setAttribute("role", "img");
         coverImage.setAttribute("aria-label", `Cover image for ${post.title}`);
         link.appendChild(coverImage);
