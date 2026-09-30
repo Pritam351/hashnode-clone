@@ -1,7 +1,8 @@
 import { isAuthenticated, logout } from "../utils/auth.js";
 import { renderNavbar } from "../components/navbar.js";
-import { showLoader, hideLoader, createLoaderElement } from "../components/loader.js";
-import { createErrorMessage, showErrorToast } from "../components/errorMessage.js";
+// import { showLoader, hideLoader, renderLoader } from "../components/loader.js";
+import {  renderLoader } from "../components/loader.js";
+import { createErrorMessage } from "../components/errorMessage.js";
 import { getMyPosts, getMyPostStats, getMyPostById, deletePost } from "../api/postApi.js";
 import { renderMarkdown } from "../utils/markdown.js";
 
@@ -102,7 +103,8 @@ function updateTabActiveState() {
 
 async function loadDashboardData() {
   try {
-    showLoader(loaderContainer);
+    // showLoader(loaderContainer);
+    renderLoader(loaderContainer, "Loading posts..."); // Ensure loader is rendered
     // Fetch statistics using the new dedicated endpoint
     const statsResponse = await getMyPostStats();
     // Fetch posts for current tab with pagination
@@ -124,9 +126,11 @@ async function loadDashboardData() {
     renderPosts(displayPostsData);
     renderPagination(postsResponse.pagination.totalPosts);
 
-    hideLoader(loaderContainer);
+    // hideLoader(loaderContainer);
+    loaderContainer.innerHTML = "";
   } catch (error) {
-    hideLoader(loaderContainer);
+    // hideLoader(loaderContainer);
+    loaderContainer.innerHTML = "";
     console.error('[DASHBOARD] Error:', error);
     showError(error);
   }
@@ -269,14 +273,17 @@ function renderPagination(totalPosts) {
 
 async function loadPosts() {
   try {
-    showLoader(loaderContainer);
+    // showLoader(loaderContainer);
+    renderLoader(loaderContainer, "Loading posts..."); // Ensure loader is rendered
     const response = await getMyPosts({ status: currentStatus !== "all" ? currentStatus : undefined, page: currentPage, limit });
     const postsData = response.posts || [];
     renderPosts(postsData);
     renderPagination(response.pagination.totalPosts);
-    hideLoader(loaderContainer);
+    // hideLoader(loaderContainer);
+    loaderContainer.innerHTML = "";
   } catch (error) {
-    hideLoader(loaderContainer);
+    // hideLoader(loaderContainer);
+    loaderContainer.innerHTML = "";
     showError(error);
   }
 }

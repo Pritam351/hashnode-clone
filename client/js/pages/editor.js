@@ -3,7 +3,7 @@ import { renderNavbar } from "../components/navbar.js";
 import { createErrorMessage } from "../components/errorMessage.js";
 import { getMyPostById, createPost, updatePost } from "../api/postApi.js";
 import { renderMarkdown, initCodeBlockActions } from "../utils/markdown.js";
-import { getTags } from "../api/tagApi.js";
+import { getTags, createTag } from "../api/tagApi.js";
 
 const navbarRoot = document.getElementById("navbar-root");
 const editorMessage = document.getElementById("editor-message");
@@ -288,26 +288,40 @@ async function handleFormSubmit() {
 
   const combinedTagNames = Array.from(new Set([...selectedTags, ...currentTagsFromInput]));
 
-  let tagIds = [];
-  if (combinedTagNames.length > 0) {
-    tagIds = combinedTagNames
-      .map((tagName) => {
-        const loadedTag = loadedPostTags.find(
-          (t) =>
-            (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
-            (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
-        );
-        if (loadedTag && loadedTag._id) return loadedTag._id;
+let tagIds = [];
 
-        const availableTag = allTags.find(
-          (t) =>
-            (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
-            (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
-        );
-        return availableTag && availableTag._id ? availableTag._id : null;
-      })
-      .filter((id) => id !== null);
-  }
+if (combinedTagNames.length > 0) {
+  const resolvedTags = await Promise.all(
+    combinedTagNames.map(async (tagName) => {
+      const loadedTag = loadedPostTags.find(
+        (t) =>
+          (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
+          (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
+      );
+
+      if (loadedTag && loadedTag._id) {
+        return loadedTag._id;
+      }
+
+      const availableTag = allTags.find(
+        (t) =>
+          (t.name && t.name.toLowerCase() === tagName.toLowerCase()) ||
+          (t.slug && t.slug.toLowerCase() === tagName.toLowerCase())
+      );
+
+      if (availableTag && availableTag._id) {
+        return availableTag._id;
+      }
+
+      // Create new tag if it does not exist
+      const response = await createTag(tagName);
+
+      return response.tag._id;
+    })
+  );
+
+  tagIds = resolvedTags.filter(Boolean);
+}
 
   const postData = {
     title,
