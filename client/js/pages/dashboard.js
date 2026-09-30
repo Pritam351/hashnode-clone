@@ -2,7 +2,7 @@ import { isAuthenticated, logout } from "../utils/auth.js";
 import { renderNavbar } from "../components/navbar.js";
 import { showLoader, hideLoader, createLoaderElement } from "../components/loader.js";
 import { createErrorMessage, showErrorToast } from "../components/errorMessage.js";
-import { getMyPosts, getMyPostById, deletePost } from "../api/postApi.js";
+import { getMyPosts, getMyPostStats, getMyPostById, deletePost } from "../api/postApi.js";
 import { renderMarkdown } from "../utils/markdown.js";
 
 const navbarRoot = document.getElementById("navbar-root");
@@ -31,7 +31,6 @@ let currentStatus = "all";
 let currentPage = 1;
 const limit = 10;
 let totalStats = { all: 0, published: 0, draft: 0 };
-let allPosts = []; // To store all posts for client-side filtering if needed
 
 async function init() {
   if (!isAuthenticated()) {
@@ -104,31 +103,26 @@ function updateTabActiveState() {
 async function loadDashboardData() {
   try {
     showLoader(loaderContainer);
-    const statsResponse = await getMyPosts({ status: undefined, page: 1, limit: 1000 }); // Fetch all to get counts
-    const postsResponse = await getMyPosts({ status: currentStatus, page: currentPage, limit });
+    // Fetch statistics using the new dedicated endpoint
+    const statsResponse = await getMyPostStats();
+    // Fetch posts for current tab with pagination
+    const postsResponse = await getMyPosts({ status: currentStatus !== "all" ? currentStatus : undefined, page: currentPage, limit });
 
     console.log('[DASHBOARD] Stats response:', statsResponse);
     console.log('[DASHBOARD] Posts response:', postsResponse);
 
-    // Backend returns { posts, pagination } format
-    const allPostsData = statsResponse.posts || [];
-
-    // Process stats
+    // Process stats from statsResponse (all posts)
     totalStats = {
-      all: allPostsData.length,
-      published: allPostsData.filter(p => p.status === "published").length,
-      draft: allPostsData.filter(p => p.status === "draft").length
+      all: statsResponse.all,
+      published: statsResponse.published,
+      draft: statsResponse.draft
     };
     updateStatsDisplay();
 
-    // Process posts for current status and page
-    allPosts = allPostsData; // Cache all posts for client-side filtering if needed
-    const filteredPosts = allPosts.filter(post =>
-      currentStatus === "all" || post.status === currentStatus
-    );
-    const paginatedPosts = paginate(filteredPosts, currentPage, limit);
-    renderPosts(paginatedPosts);
-    renderPagination(filteredPosts.length);
+    // Process posts for current status and page from postsResponse
+    const displayPostsData = postsResponse.posts || [];
+    renderPosts(displayPostsData);
+    renderPagination(postsResponse.pagination.totalPosts);
 
     hideLoader(loaderContainer);
   } catch (error) {
@@ -136,11 +130,6 @@ async function loadDashboardData() {
     console.error('[DASHBOARD] Error:', error);
     showError(error);
   }
-}
-
-function paginate(array, page, limit) {
-  const start = (page - 1) * limit;
-  return array.slice(start, start + limit);
 }
 
 function renderPosts(posts) {
@@ -282,12 +271,9 @@ async function loadPosts() {
   try {
     showLoader(loaderContainer);
     const response = await getMyPosts({ status: currentStatus !== "all" ? currentStatus : undefined, page: currentPage, limit });
-    const filteredPosts = allPosts.filter(post =>
-      currentStatus === "all" || post.status === currentStatus
-    );
-    const paginatedPosts = paginate(filteredPosts, currentPage, limit);
-    renderPosts(paginatedPosts);
-    renderPagination(filteredPosts.length);
+    const postsData = response.posts || [];
+    renderPosts(postsData);
+    renderPagination(response.pagination.totalPosts);
     hideLoader(loaderContainer);
   } catch (error) {
     hideLoader(loaderContainer);

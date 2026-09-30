@@ -18,6 +18,7 @@ const protect = (req, res, next) => {
         );
 
         req.userId = decoded.userId;
+        console.log(`[AUTH] Decoded token userId: ${req.userId}`);
 
         next();
 

@@ -192,6 +192,7 @@ const getPostBySlug = async (req, res, next) => {
 
 const getMyPosts = async (req, res) => {
     try {
+        console.log(`[DASHBOARD] Fetching posts for userId: ${req.userId}`);
 
         const { status } = req.query;
 
@@ -200,13 +201,15 @@ const getMyPosts = async (req, res) => {
 
         if (page < 1 || limit < 1) {
             return res.status(400).json({
-                message: " page and limit must be grate than 0"
+                message: "Page and limit must be greater than 0"
             });
         }
 
         const filter = {
             author: req.userId
         };
+
+        console.log(`[DASHBOARD] Filter:`, filter);
 
         if (status) {
             if (status !== "draft" && status !== "published") {
@@ -226,6 +229,8 @@ const getMyPosts = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
+        console.log(`[DASHBOARD] Found ${posts.length} posts`);
+
         const totalPosts = await Post.countDocuments(filter);
         const totalPages = Math.ceil(totalPosts / limit);
 
@@ -240,7 +245,7 @@ const getMyPosts = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error(`[DASHBOARD] Error:`, error);
 
         return res.status(500).json({
             message: "Server error"
@@ -265,6 +270,35 @@ const getMyPostById = async (req, res, next) => {
 
         return res.status(200).json({
             post
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getMyPostStats = async (req, res, next) => {
+    try {
+        const authorId = req.userId;
+
+        // Count all posts for this user
+        const allCount = await Post.countDocuments({ author: authorId });
+
+        // Count published posts for this user
+        const publishedCount = await Post.countDocuments({
+            author: authorId,
+            status: "published"
+        });
+
+        // Count draft posts for this user
+        const draftCount = await Post.countDocuments({
+            author: authorId,
+            status: "draft"
+        });
+
+        return res.status(200).json({
+            all: allCount,
+            published: publishedCount,
+            draft: draftCount
         });
     } catch (error) {
         next(error);
@@ -409,6 +443,7 @@ module.exports = {
     getPosts,
     getPostBySlug,
     getMyPosts,
+    getMyPostStats,
     getMyPostById,
     updatePost,
     deletePost

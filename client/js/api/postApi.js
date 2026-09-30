@@ -30,6 +30,10 @@ export async function getMyPosts(options = {}) {
     });
 }
 
+export async function getMyPostStats() {
+    return apiClient.get("/posts/my-posts/stats");
+}
+
 export async function createPost(postData) {
     return apiClient.post("/posts", postData);
 }
