@@ -498,7 +498,7 @@ function hideTagSuggestions() {
 }
 
 function updateTagDisplay() {
-  editorTagsInput.value = selectedTags.join(", ");
+  editorTagsInput.value = selectedTags.length > 0 ? selectedTags.join(", ") + ", " : "";
   if (tagInputHelp) {
     tagInputHelp.style.opacity = selectedTags.length > 0 ? "0.5" : "1";
   }
